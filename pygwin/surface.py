@@ -1,3 +1,4 @@
+from pygwin.rect import rect as _r
 from pygwin._pg import pg as _pg
 
 class surface:
@@ -69,6 +70,13 @@ class surface:
         self._orig = _pg.transform.smoothscale(self._orig,scale)
         self._orig = _pg.transform.smoothscale(self._orig,self._orig.get_size())
         return self.copy()
+    def rect(self, x=0, y=0, center=None):
+        if center == None:
+            return _r(x, y, self.size[0], self.size[1])
+        else:
+            return _r(center[0]-(self.size[0]/2),
+                      center[1]-(self.size[1]/2),
+                      self.size[0], self.size[1])
     class _draw:
         def __init__(self,surface):
             self._surf = surface

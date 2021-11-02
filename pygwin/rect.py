@@ -24,11 +24,7 @@ class rect:
             pass
         return locals()
     height = property(**height())
-    def contains(self, xorect, y=None):
-        if type(xorect) == rect and y == None:
-            return pg.Rect(self.x,self.y,
-            self.w,self.h).contains(pg.Rect(
-            xorect.x,xorect.y,xorect.w,xorect.h))
-        elif type(xorect) != rect and y != None:
-            return pg.Rect(self.x,self.y,self.w,
-            self.h).collidepoint((xorect,y))
+    def collide(self, x):
+        return pg.Rect(self.x,self.y,self.w,self.h).colliderect(pg.Rect(x.x,x.y,x.w,x.h))
+    def contains(self, x, y):
+        return pg.Rect(self.x,self.y,self.w,self.h).collidepoint(x,y)
