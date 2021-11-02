@@ -20,23 +20,23 @@ def load(path):
         surf._surface_orig = image
         return surf
 
-def save(surface, path):
+def save(surface, dest):
     if type(surface) == _surface:
         orig = surface._surface_orig
     else:
         orig = surface._orig
-    _pg.image.save_extended(orig, path)
+    _pg.image.save_extended(orig, dest)
 
 def toString(surface):
     if type(surface) == _surface:
         orig = surface._surface_orig
     else:
         orig = surface._orig
-    return _p.dumps([_pg.image.tostring(orig, "RGBA"), list(surface.size)])
+    return _p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)],0)
 
 def fromString(string):
-    string = _p.loads(string)
-    surf = _pg.image.fromstring(string[0], tuple(string[1]), "RGBA")
+    string = _p.loads(string, encoding='latin1')
+    surf = _pg.image.fromstring(string[0],tuple(string[1]),"RGBA")
     surface = _surface(tuple(string[1]))
     surface._surface_orig = surf
     return surface

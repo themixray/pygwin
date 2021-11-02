@@ -5,7 +5,6 @@ import pygwin.mouse as mouse
 from pygwin.rect import rect
 import pygwin.image as image
 import pygwin.mixer as mixer
-from pygwin.events import *
 from pygame.locals import *
 from pygwin.font import *
 from pygwin._win import *

@@ -1,9 +1,10 @@
 from pygwin._pg import pg as _pg
 
-def isPressed(x):
-    return _pg.mouse.get_pressed()[x]
 def getPressed():
-    return _pg.mouse.get_pressed()
+    orig = _pg.mouse.get_pressed(3)
+    return {'left':orig[0],'middle':orig[1],'right':orig[2]}
+def isPressed(x):
+    return getPressed()[x]
 def setPosition(x):
     _pg.mouse.set_pos(x)
 def getPosition():

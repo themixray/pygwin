@@ -6,12 +6,6 @@ class surface:
         self._size = size
         self._orig = _pg.Surface(size, _pg.SRCALPHA)
         self._pixels = []
-    #     self._pixels = []
-    #     pxls = _pg.PixelArray(self._orig)
-    #     for x in range(self.size[0]):
-    #         self._pixels.append([])
-    #         for y in range(self.size[1]):
-    #             self._pixels[x].append(pxls[x, y])
     @property
     def pixels(self):
         pixels = []
@@ -24,12 +18,18 @@ class surface:
     @property
     def size(self):
         return self._size
+    def rect(self, x=0, y=0, center=[]):
+        if center == []:
+            return _r(x, y, self.size[0], self.size[1])
+        else:
+            return _r(center[0]-(self.size[0]/2),
+                      center[1]-(self.size[1]/2),
+                      self.size[0], self.size[1])
     def copy(self):
         surf = surface(self.size)
         surf._surface_orig = self._orig
         return surf
     def getPixel(self, x, y):
-        # return self._pixels[x][y]
         return self._orig.get_at((x,y))
     def setPixel(self, x, y, color):
         self._orig.set_at((x,y),color)
@@ -42,11 +42,6 @@ class surface:
         return self.copy()
     def fill(self, color):
         self._orig.fill(color)
-        # self._pixels = []
-        # for x in range(self.size[0]):
-        #     self._pixels.append([])
-        #     for y in range(self.size[1]):
-        #         self._pixels[x].append(color)
         return self.copy()
     def crop(self, rect):
         self._orig = self._orig.subsurface((rect.x,rect.y,rect.w,rect.h))
@@ -67,16 +62,10 @@ class surface:
         if amt < 0:
             return self.copy()
         scale = (int(self._orig.get_width()*(amt+1)),int(self._orig.get_height()[1]*(amt+1)))
+        size = self._orig.get_size()
         self._orig = _pg.transform.smoothscale(self._orig,scale)
-        self._orig = _pg.transform.smoothscale(self._orig,self._orig.get_size())
+        self._orig = _pg.transform.smoothscale(self._orig,size)
         return self.copy()
-    def rect(self, x=0, y=0, center=None):
-        if center == None:
-            return _r(x, y, self.size[0], self.size[1])
-        else:
-            return _r(center[0]-(self.size[0]/2),
-                      center[1]-(self.size[1]/2),
-                      self.size[0], self.size[1])
     class _draw:
         def __init__(self,surface):
             self._surf = surface

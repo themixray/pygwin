@@ -16,12 +16,30 @@ class win(_surface):
             self._clock.tick(fps)
             self._withfps = True
         _pg.display.update()
-    def title(self, title):
-        _pg.display.set_caption(title)
-    def icon(self, path):
-        _pg.display.set_icon(_pg.image.load(path))
-    def resize(self, size):
-        _pg.display.set_mode(size)
+    def title():
+        def fget(self):
+            return _pg.display.get_caption()
+        def fset(self, value):
+            if type(value) != str:
+                return
+            _pg.display.set_caption(value)
+        def fdel(self):
+            pass
+        return locals()
+    title = property(**title())
+    def icon(value):
+        _pg.display.set_icon(_pg.image.load(value))
+    def size():
+        def fget(self):
+            return _pg.display.get_window_size()
+        def fset(self, value):
+            if type(value) != tuple or type(value) != list:
+                return
+            _pg.display.set_mode(value)
+        def fdel(self):
+            pass
+        return locals()
+    size = property(**size())
     def fullscreen(self):
         _pg.display.toogle_fullscreen()
     def close(self):
@@ -89,3 +107,6 @@ def ramLimit(bytes):
 def close():
     _pg.quit()
     quit()
+
+def getEvents():
+    return _pg.event.get()
