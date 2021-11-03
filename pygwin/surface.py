@@ -5,7 +5,6 @@ class surface:
     def __init__(self, size):
         self._size = size
         self._orig = _pg.Surface(size, _pg.SRCALPHA)
-        self._pixels = []
     @property
     def pixels(self):
         pixels = []
@@ -26,8 +25,9 @@ class surface:
                       center[1]-(self.size[1]/2),
                       self.size[0], self.size[1])
     def copy(self):
-        surf = surface(self.size)
+        surf = surface(self._size)
         surf._surface_orig = self._orig
+        surf._surface_size = self._size
         return surf
     def getPixel(self, x, y):
         return self._orig.get_at((x,y))
@@ -38,7 +38,10 @@ class surface:
         if type(surf) != surface:
             from pygwin.font import defaultFont as _df
             surf = _df.render(surf, 25, (0,0,0))
-        self._orig.blit(surf._surface_orig, xy)
+        try:
+            self._orig.blit(surf._surface_orig, xy)
+        except:
+            self._orig.blit(surf._orig, xy)
         return self.copy()
     def fill(self, color):
         self._orig.fill(color)
@@ -75,9 +78,9 @@ class surface:
                  borderTopRightRadius=-1,
                  borderBottomLeftRadius=-1,
                  borderBottomRightRadius=-1):
-            if type(self._surf) == surface:
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.rect(orig,color,_pg.Rect(rect.x,rect.y,rect.w,rect.h),
                          width,borderRadius,borderTopLeftRadius,
@@ -85,44 +88,44 @@ class surface:
                          borderBottomRightRadius)
             return self._surf.copy()
         def polygon(self, color, points, width=0):
-            if type(self._surf) == surface:
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.polygon(orig,color,points,width)
             return self._surf.copy()
         def circle(self,color,center,
                    radius,width=0,
-                   drawTopLeft=None,
-                   drawTopRight=None,
-                   drawBottomLeft=None,
-                   drawBottomRight=None):
-            if type(self._surf) == surface:
+                   drawTopLeft=1,
+                   drawTopRight=1,
+                   drawBottomLeft=1,
+                   drawBottomRight=1):
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.circle(orig,color,center,radius,
                             width,drawTopRight,drawTopLeft,
                             drawBottomLeft,drawBottomRight)
             return self._surf.copy()
         def ellipse(self,color,rect,width=0):
-            if type(self._surf) == surface:
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.ellipse(orig,color,_pg.Rect(rect.x,rect.y,rect.w,rect.h),width)
             return self._surf.copy()
         def line(self,color,start,end,width=1):
-            if type(self._surf) == surface:
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.line(orig,color,start,end,width)
             return self._surf.copy()
         def arc(self,color,rect,startAngle,stopAngle,width=1):
-            if type(self._surf) == surface:
+            try:
                 orig = self._surf._surface_orig
-            else:
+            except:
                 orig = self._surf._orig
             _pg.draw.arc(orig,color,
                         _pg.Rect(rect.x,rect.y,rect.w,rect.h),

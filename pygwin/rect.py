@@ -6,6 +6,7 @@ class rect:
         self.y = y
         self.w = w
         self.h = h
+        self._rect = pg.Rect(x,y,w,h)
     def width():
         def fget(self):
             return self.w
@@ -25,6 +26,6 @@ class rect:
         return locals()
     height = property(**height())
     def collide(self, x):
-        return pg.Rect(self.x,self.y,self.w,self.h).colliderect(pg.Rect(x.x,x.y,x.w,x.h))
+        return self._rect.colliderect(x._rect_rect)
     def contains(self, x, y):
-        return pg.Rect(self.x,self.y,self.w,self.h).collidepoint(x,y)
+        return self._rect.collidepoint(x,y)

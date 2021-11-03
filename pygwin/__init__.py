@@ -9,4 +9,5 @@ from pygame.locals import *
 from pygwin.font import *
 from pygwin._win import *
 from pygwin._pg import pg
+from pygwin.ui import *
 gamepad = _gp.gamepad(pg)

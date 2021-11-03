@@ -29,7 +29,8 @@ class gamepad:
         self._start()
     def _tick(self):
         events = _inputs.get_gamepad()
-        if not self._pygame.display.get_active():return
+        if not self._pygame.display.get_active():
+            return
         self.founded = True
         if events:
             for event in events:
