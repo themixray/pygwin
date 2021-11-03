@@ -27,18 +27,15 @@ def save(surface, dest):
         orig = surface._orig
     _pg.image.save_extended(orig, dest)
 
-def toBytes(surface):
+def toString(surface):
     try:
         orig = surface._surface_orig
     except:
         orig = surface._orig
-    return _bz2.compress(
-            _p.dumps([
-        _pg.image.tostring(orig,"RGBA"),
-                list(surface.size)]))
+    return _bz2.compress(_p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)])).decode('latin1')
 
-def fromBytes(string):
-    string = _p.loads(_bz2.decompress(string))
+def fromString(string):
+    string = _p.loads(_bz2.decompress(string.encode('latin1')))
     surf = _pg.image.fromstring(string[0],tuple(string[1]),"RGBA")
     surface = _surface(tuple(string[1]))
     surface.blit(surf,(0,0))
