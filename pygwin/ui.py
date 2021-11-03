@@ -140,8 +140,6 @@ class entry(widget):
                 self.width = hintSize[0]+50
         self.surface = _s((self.width,self.height))
         self.wclk = []
-    def get(self):
-        return text
     def _generate(self,position=None):
         self.surface.fill(self.borderColor)
         if self.focus:
@@ -224,6 +222,8 @@ class entry(widget):
     def draw(self, win, pos):
         self._generate(pos)
         win.blit(self.surface,pos)
+    def get(self):
+        return text
 class image(widget):
     def __init__(self, path):
         self.surface = _l(path)
@@ -245,6 +245,10 @@ class loadingBar(widget):
         self.borderWidth = borderWidth
     def step(self,count=1):
         self.loaded += 1
+        if self.loaded > self.length:
+            self.loaded = self.length
+    def set(self, x):
+        self.loaded = x
         if self.loaded > self.length:
             self.loaded = self.length
     def reset(self):
