@@ -2,6 +2,7 @@ from pygwin._pg import pg as _pg
 from pygwin.surface import surface as _surface
 from PIL import Image as _im
 import pickle as _p
+import bz2 as _bz2
 
 def load(path):
     if path.endswith('.gif'):
@@ -31,10 +32,13 @@ def toBytes(surface):
         orig = surface._surface_orig
     except:
         orig = surface._orig
-    return _p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)])
+    return _bz2.compress(
+            _p.dumps([
+        _pg.image.tostring(orig,"RGBA"),
+                list(surface.size)]))
 
 def fromBytes(string):
-    string = _p.loads(string)
+    string = _p.loads(_bz2.decompress(string))
     surf = _pg.image.fromstring(string[0],tuple(string[1]),"RGBA")
     surface = _surface(tuple(string[1]))
     surface.blit(surf,(0,0))
