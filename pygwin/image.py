@@ -1,11 +1,11 @@
 from pygwin._pg import pg as _pg
 from pygwin.surface import surface as _surface
-from PIL import Image as _image
+from PIL import Image as _im
 import pickle as _p
 
 def load(path):
     if path.endswith('.gif'):
-        im = Image.open(path)
+        im = _im.open(path)
         surfs = []
         for i in range(im.n_frames):
             im.seek(i)
@@ -15,9 +15,8 @@ def load(path):
             surfs.append(surf)
         return surfs
     else:
-        image = _pg.image.load(path)
-        surf = _surface(image.get_size())
-        surf._surface_orig = image
+        surf = _surface(_im.open(path).size)
+        surf.blit(_pg.image.load(path),(0,0))
         return surf
 
 def save(surface, dest):
@@ -27,16 +26,16 @@ def save(surface, dest):
         orig = surface._orig
     _pg.image.save_extended(orig, dest)
 
-def toString(surface):
-    if type(surface) == _surface:
+def toBytes(surface):
+    try:
         orig = surface._surface_orig
-    else:
+    except:
         orig = surface._orig
-    return _p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)],0)
+    return _p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)])
 
-def fromString(string):
-    string = _p.loads(string, encoding='latin1')
+def fromBytes(string):
+    string = _p.loads(string)
     surf = _pg.image.fromstring(string[0],tuple(string[1]),"RGBA")
     surface = _surface(tuple(string[1]))
-    surface._surface_orig = surf
+    surface.blit(surf,(0,0))
     return surface

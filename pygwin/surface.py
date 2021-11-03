@@ -35,13 +35,16 @@ class surface:
         self._orig.set_at((x,y),color)
         return self.copy()
     def blit(self, surf, xy):
-        if type(surf) != surface:
+        if type(surf) != surface and type(surf) != _pg.Surface:
             from pygwin.font import defaultFont as _df
             surf = _df.render(surf, 25, (0,0,0))
         try:
             self._orig.blit(surf._surface_orig, xy)
         except:
-            self._orig.blit(surf._orig, xy)
+            try:
+                self._orig.blit(surf._orig, xy)
+            except:
+                self._orig.blit(surf, xy)
         return self.copy()
     def fill(self, color):
         self._orig.fill(color)
@@ -50,8 +53,8 @@ class surface:
         self._orig = self._orig.subsurface((rect.x,rect.y,rect.w,rect.h))
         self._size = self._orig.get_size()
         return self.copy()
-    def scale(self, rect):
-        self._orig = _pg.transform.scale(self._orig, (rect.w, rect.h))
+    def scale(self, size):
+        self._orig = _pg.transform.scale(self._orig, size)
         self._size = self._orig.get_size()
         return self.copy()
     def rotate(self, angle):
@@ -62,9 +65,9 @@ class surface:
         self._orig = _pg.transform.flip(self._orig, x, y)
         return self.copy()
     def blur(self, amt):
-        if amt < 0:
-            return self.copy()
-        scale = (int(self._orig.get_width()*(amt+1)),int(self._orig.get_height()[1]*(amt+1)))
+        if amt < 0:return self.copy()
+        scale = (int(self._orig.get_width()*(amt+1)),
+                 int(self._orig.get_height()*(amt+1)))
         size = self._orig.get_size()
         self._orig = _pg.transform.smoothscale(self._orig,scale)
         self._orig = _pg.transform.smoothscale(self._orig,size)
