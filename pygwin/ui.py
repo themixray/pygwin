@@ -254,7 +254,7 @@ class loadingBar(widget):
                 (self.surface.size[0]/self.length*self.loaded)-self.borderWidth*2,
                                         self.surface.size[1]-self.borderWidth*2))
         win.blit(self.surface, pos)
-class scrollBar(widget):
+class slider(widget):
     def __init__(self,width,
                  bg=(70,70,70),
                  fg=(50,200,50),
@@ -268,13 +268,13 @@ class scrollBar(widget):
             self.surface.draw.line(self.bg,[5,25],[self.width-5,25],10)
             self.surface.draw.circle(self.bg,[5,26],5)
             self.surface.draw.circle(self.bg,[self.width-5,26],5)
-            self.surface.draw.line(self.fg,[self.x+5,11],[self.x+5,39],6)
+            self.surface.draw.circle(self.fg,[self.x+5,25],25)
         else:
             self.surface = _s((50,self.width))
             self.surface.draw.line(self.bg,[25,5],[25,self.width-5],10)
             self.surface.draw.circle(self.bg,[26,5],5)
             self.surface.draw.circle(self.bg,[26,self.width-5],5)
-            self.surface.draw.line(self.fg,[11,self.x+5],[39,self.x+5],6)
+            self.surface.draw.circle(self.fg,[25,self.x+5],25)
         if pos != None:
             if _m.isPressed('left'):
                 if self.horizontal:

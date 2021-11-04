@@ -1,8 +1,11 @@
 from pygwin.surface import surface as _surface
 from datetime import datetime as _dt
 from pygwin._pg import pg as _pg
+from pygwin.image import save as _s
 import win32job as _w32j
 import win32api as _w32a
+import win32con as _w32c
+import win32gui as _w32g
 
 class win(_surface):
     def __init__(self):
@@ -33,7 +36,7 @@ class win(_surface):
         def fget(self):
             return _pg.display.get_window_size()
         def fset(self, value):
-            if type(value) != tuple or type(value) != list:
+            if type(value) in [list,tuple]:
                 return
             _pg.display.set_mode(value)
         def fdel(self):
@@ -44,6 +47,31 @@ class win(_surface):
         _pg.display.toogle_fullscreen()
     def close(self):
         _pg.display.quit()
+        _w32g.PostMessage(self.hwnd, _w32c.WM_CLOSE, 0, 0)
+    def focus(self):
+        self.hide()
+        self.show()
+        _w32g.BringWindowToTop(self.hwnd)
+        _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOWNORMAL)
+        _w32g.SetForegroundWindow(self.hwnd)
+    def unfocus(self):
+        pass
+    def hide(self):
+        _w32g.ShowWindow(self.hwnd, _w32c.SW_HIDE)
+    def show(self):
+        _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOW)
+    def move(self, x, y):
+        rect = _w32g.GetWindowRect(self.hwnd)
+        _w32g.MoveWindow(self.hwnd, x, y, rect[2]-x, rect[3]-y, 0)
+    def screenshot(self, path):
+        _s(self._orig, path)
+        return path
+    @property
+    def position(self):
+        rect = _w32g.GetWindowRect(self.hwnd)
+        x = rect[0]
+        y = rect[1]
+        return (x, y)
     @property
     def rawFps(self):
         if self._withfps:
@@ -56,6 +84,10 @@ class win(_surface):
     @property
     def hwnd(self):
         return _pg.display.get_wm_info()['window']
+    @property
+    def visible(self):
+        return _w32g.IsWindowVisible(self._win)
+
 
 def create(title=None, size=(0,0), icon=None):
     screen = _pg.display.set_mode(size)
