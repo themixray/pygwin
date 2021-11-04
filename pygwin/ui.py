@@ -242,6 +242,8 @@ class loadingBar(widget):
             self.loaded = self.length
     def reset(self):
         self.loaded = 0
+    def get(self):
+        return self.loaded
     def draw(self, win, pos):
         self.surface = _s((self.width,self.height))
         self.surface.fill(self.borderColor)
