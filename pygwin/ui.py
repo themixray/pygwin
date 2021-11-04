@@ -6,12 +6,18 @@ from pygwin.rect import rect as _r
 import pygwin.mouse as _m
 import pygwin.keyboard as _k
 import ctypes as _ct
+import copy as _copy
 
 class widget:
     power = True
     destroyed = False
+    def _args(self, locals):
+        args = _copy.copy(locals)
+        for i in args.items():
+            if i[0] != 'self':
+                exec(f'self.{i[0]} = args["{i[0]}"]')
     def __init__(self, surface):
-        self.surface = surface
+        self._args(locals())
     def draw(self, win, pos):
         win.blit(self.surface,pos)
     def on(self):
@@ -20,6 +26,11 @@ class widget:
         self.power = False
     def destroy(self):
         self.destroyed = True
+    def config(self, **parameters):
+        if parameters != {}:
+            for i in parameters.items():
+                if i[0] in list(self.__dict__.keys()):
+                    exec(f'self.{i[0]} = parameters["{i[0]}"]')
 class button(widget):
     def __init__(self,text,
                  func=lambda:None,
@@ -28,21 +39,10 @@ class button(widget):
                  bg=(70,70,70),fg=(180,180,200),
                  afg=(50,50,50),abg=(200,200,200),
                  borderColor=(50,50,50),borderWidth=5):
-        self.text = text
-        self.fontSize = fontSize
-        self.font = font
-        self.width = width
-        self.height = height
-        self.bg = bg
-        self.fg = fg
-        self.afg = afg
-        self.abg = abg
-        self.func = func
+        super()._args(locals())
         self.cl0 = False
         self.cl1 = False
         self.nc0 = True
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
         self._generate()
     def _generate(self, position=None):
         if self.width == None or self.height == None:
@@ -103,31 +103,20 @@ class label(widget):
         self.surface = font.render(text,size,color)
 class entry(widget):
     def __init__(self,hint='',fontSize=30,font=_df,
+                 width=None,height=None,
                  bg=(70,70,70),fg=(180,180,200),
                  afg=(200,200,200),abg=(50,50,50),
                  hintColor=(100,100,100),
                  lineColor=(200,200,200),
                  borderColor=(50,50,50),
-                 borderWidth=5,
-                 width=None,height=None):
+                 borderWidth=5,maxSymbols=None,
+                 whitelist=None,blacklist=[]):
+        super()._args(locals())
         self.text = ''
         self.focus = False
         self.tick = 0
-        self.hint = hint
-        self.fontSize = fontSize
-        self.font = font
-        self.bg = bg
-        self.fg = fg
-        self.abg = abg
-        self.afg = afg
-        self.width = width
-        self.height = height
         self.wcl = False
         self.startHint = self.hint
-        self.hintColor = hintColor
-        self.lineColor = lineColor
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
         self.ws = False
         if self.width == None or self.height == None:
             if self.hint != '':
@@ -211,12 +200,18 @@ class entry(widget):
                 if _m.isPressed('left'):
                     self.focus = False
     def insert(self,text):
-        if _ct.WinDLL("User32.dll").GetKeyState(0x14):
-            text = text.upper()
-        if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
-            text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-                               '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
-        self.text += text
+        if len(text) < self.maxSymbols:
+            if _ct.WinDLL("User32.dll").GetKeyState(0x14):
+                text = text.upper()
+            if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
+                text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
+                                   '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+            if text in self.blacklist:
+                return
+            if self.whitelist != None:
+                if text not in self.whitelist:
+                    return
+            self.text += text
     def delete(self,symbols=1):
         self.text = self.text[:0-symbols]
     def draw(self, win, pos):
@@ -235,14 +230,8 @@ class loadingBar(widget):
                  loadedColor=(50,200,50),
                  borderColor=(50,50,50),
                  borderWidth=5):
-        self.surface = _s((width,height))
-        self.surface.fill(bg)
-        self.length = length
-        self.bg = bg
-        self.loadedColor = loadedColor
+        super()._args(locals())
         self.loaded = 0
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
     def step(self,count=1):
         self.loaded += 1
         if self.loaded > self.length:
@@ -254,6 +243,7 @@ class loadingBar(widget):
     def reset(self):
         self.loaded = 0
     def draw(self, win, pos):
+        self.surface = _s((self.width,self.height))
         self.surface.fill(self.borderColor)
         self.surface.draw.rect(self.bg,_r(5,5,
                             self.surface.size[0]-10,
@@ -267,10 +257,7 @@ class scrollBar(widget):
                  bg=(70,70,70),
                  fg=(50,200,50),
                  horizontal=True):
-        self.horizontal = horizontal
-        self.width = width
-        self.bg = bg
-        self.fg = fg
+        super()._args(locals())
         self.x = 0
         self._generate(None)
     def _generate(self, pos):
@@ -314,17 +301,11 @@ class checkBox(widget):
                  fg=(50,180,50),afg=(70,200,70),
                  abg=(120,120,120),borderColor=(220,220,220),
                  borderWidth=5):
-        self.width = width
-        self.bg = bg
-        self.fg = fg
-        self.afg = afg
-        self.abg = abg
+        super()._args(locals())
         self.cl0 = False
         self.cl1 = False
         self.nc0 = True
         self.x = False
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
         self._generate()
     def set(self, x):
         self.x = x
@@ -359,15 +340,15 @@ class checkBox(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.x:
-                self.surface.draw.line(self.afg,[5,self.width/2+5],[self.width/2,self.width-5],7)
-                self.surface.draw.line(self.afg,[self.width/2,self.width-5],[self.width-5,5],7)
+                self.surface.draw.line(self.afg,[self.borderWidth,self.width/2+self.borderWidth],[self.width/2,self.width-self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.afg,[self.width/2,self.width-self.borderWidth],[self.width-self.borderWidth,self.borderWidth],self.borderWidth)
         else:
             self.surface.draw.rect(self.bg,_r(self.borderWidth,self.borderWidth,
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.x:
-                self.surface.draw.line(self.fg,[5,self.width/2+5],[self.width/2,self.width-5],7)
-                self.surface.draw.line(self.fg,[self.width/2,self.width-5],[self.width-5,5],7)
+                self.surface.draw.line(self.fg,[self.borderWidth,self.width/2+self.borderWidth],[self.width/2,self.width-self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.fg,[self.width/2,self.width-self.borderWidth],[self.width-self.borderWidth,self.borderWidth],self.borderWidth)
     def draw(self, win, pos):
         self._generate(pos)
         win.blit(self.surface,pos)

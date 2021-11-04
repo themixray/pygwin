@@ -53,8 +53,11 @@ class surface:
         self._orig = self._orig.subsurface((rect.x,rect.y,rect.w,rect.h))
         self._size = self._orig.get_size()
         return self.copy()
-    def scale(self, size):
-        self._orig = _pg.transform.scale(self._orig, size)
+    def scale(self, size, smooth=False):
+        if not smooth:
+            self._orig = _pg.transform.scale(self._orig, size)
+        else:
+            self._orig = _pg.transform.smoothscale(self._orig, size)
         self._size = self._orig.get_size()
         return self.copy()
     def rotate(self, angle):
