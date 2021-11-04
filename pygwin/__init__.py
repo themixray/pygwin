@@ -15,10 +15,12 @@ try:
 except ModuleNotFoundError as e:
     import pip,os,sys
     if 'imofpgw' in sys.argv:
+        os.system('cls' if os.name in ('nt', 'dos') else 'clear')
         raise e
     def install(package):
         if hasattr(pip,'main'):pip.main(['install',package])
         else:pip._internal.main(['install',package])
+        os.system('cls' if os.name in ('nt', 'dos') else 'clear')
     modules = ['datetime',
                'tempfile',
                'pywin32',
@@ -29,4 +31,4 @@ except ModuleNotFoundError as e:
                'ctypes']
     for i in modules:
         install(i)
-    os.execv(sys.argv[0], sys.argv+['imofpgw'])
+    os.execv(sys.executable, ['python']+sys.argv+['imofpgw'])
