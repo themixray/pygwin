@@ -200,18 +200,20 @@ class entry(widget):
                 if _m.isPressed('left'):
                     self.focus = False
     def insert(self,text):
-        if len(text) < self.maxSymbols:
-            if _ct.WinDLL("User32.dll").GetKeyState(0x14):
-                text = text.upper()
-            if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
-                text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-                                   '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
-            if text in self.blacklist:
+        if _ct.WinDLL("User32.dll").GetKeyState(0x14):
+            text = text.upper()
+        if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
+            text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
+                               '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+        if text in self.blacklist:
+            return
+        if self.whitelist != None:
+            if text not in self.whitelist:
                 return
-            if self.whitelist != None:
-                if text not in self.whitelist:
-                    return
-            self.text += text
+        if self.maxSymbols != None:
+            if len(text) > self.maxSymbols:
+                return
+        self.text += text
     def delete(self,symbols=1):
         self.text = self.text[:0-symbols]
     def draw(self, win, pos):
@@ -257,24 +259,25 @@ class loadingBar(widget):
 class slider(widget):
     def __init__(self,width,
                  bg=(70,70,70),
-                 fg=(50,200,50),
+                 fg=(200,200,200),
                  horizontal=True):
         super()._args(locals())
+        self.s = False
         self.x = 0
         self._generate(None)
     def _generate(self, pos):
         if self.horizontal:
-            self.surface = _s((self.width,50))
-            self.surface.draw.line(self.bg,[5,25],[self.width-5,25],10)
-            self.surface.draw.circle(self.bg,[5,26],5)
-            self.surface.draw.circle(self.bg,[self.width-5,26],5)
-            self.surface.draw.circle(self.fg,[self.x+5,25],25)
+            self.surface = _s((self.width+12.5,50))
+            self.surface.draw.line(self.bg,[12.5,25],[self.width-12.5,25],10)
+            self.surface.draw.circle(self.bg,[12.5,26],5)
+            self.surface.draw.circle(self.bg,[self.width-12.5,26],5)
+            self.surface.draw.circle(self.fg,[(self.x*((self.width-25)/self.width))+12.5,25],12.5)
         else:
-            self.surface = _s((50,self.width))
-            self.surface.draw.line(self.bg,[25,5],[25,self.width-5],10)
-            self.surface.draw.circle(self.bg,[26,5],5)
-            self.surface.draw.circle(self.bg,[26,self.width-5],5)
-            self.surface.draw.circle(self.fg,[25,self.x+5],25)
+            self.surface = _s((50,self.width+12.5))
+            self.surface.draw.line(self.bg,[25,12.5],[25,self.width-12.5],10)
+            self.surface.draw.circle(self.bg,[26,12.5],5)
+            self.surface.draw.circle(self.bg,[26,self.width-12.5],5)
+            self.surface.draw.circle(self.fg,[25,self.x+12.5],12.5)
         if pos != None:
             if _m.isPressed('left'):
                 if self.horizontal:
@@ -282,15 +285,19 @@ class slider(widget):
                               self.surface.size[0]-10,
                               self.surface.size[1])
                     if rect.contains(_m.getPosition()[0],
-                                     _m.getPosition()[1]):
+                                     _m.getPosition()[1]) or self.s:
                         self.x = _m.getPosition()[0]-pos[0]-5
+                        self.s = True
                 else:
                     rect = _r(pos[0],pos[1]+5,
                               self.surface.size[0],
                               self.surface.size[1]-10)
                     if rect.contains(_m.getPosition()[0],
-                                     _m.getPosition()[1]):
+                                     _m.getPosition()[1]) or self.s:
                         self.x = _m.getPosition()[1]-pos[1]-5
+                        self.s = True
+            else:
+                self.s = False
     def get(self):
         return int(self.x/(self.width-10)*101)
     def set(self, x):
