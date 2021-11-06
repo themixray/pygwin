@@ -129,6 +129,7 @@ class entry(widget):
                 self.width = hintSize[0]+50
         self.surface = _s((self.width,self.height))
         self.wclk = []
+        self.wsnr = False
     def _generate(self,position=None):
         self.surface.fill(self.borderColor)
         if self.focus:
@@ -150,7 +151,7 @@ class entry(widget):
                             self.insert(i[0])
                         elif i[0] == 'backspace':
                             self.delete()
-                        elif i[0] == 'enter':
+                        elif i[0] == 'return':
                             self.focus = False
                         elif i[0] == 'space':
                             self.insert(' ')
@@ -195,8 +196,11 @@ class entry(widget):
                         self.wcl = True
                 else:
                     self.wcl = False
+                self.wsnr = False
             else:
-                _m.setCursor(_pg.SYSTEM_CURSOR_ARROW)
+                if not self.wsnr:
+                    _m.setCursor(_pg.SYSTEM_CURSOR_ARROW)
+                    self.wsnr = True
                 if _m.isPressed('left'):
                     self.focus = False
     def insert(self,text):
@@ -221,6 +225,112 @@ class entry(widget):
         win.blit(self.surface,pos)
     def get(self):
         return text
+class keySelect(entry):
+    def __init__(self,keyBefore='',
+                 fontSize=30,font=_df,
+                 width=None,height=None,
+                 bg=(70,70,70),fg=(180,180,200),
+                 afg=(200,200,200),abg=(50,50,50),
+                 hintColor=(100,100,100),
+                 lineColor=(200,200,200),
+                 borderColor=(50,50,50),
+                 borderWidth=5,maxSymbols=None,
+                 whitelist=None,blacklist=[]):
+        super()._args(locals())
+        self.hint = ''
+        self.text = keyBefore
+        self.focus = False
+        self.tick = 0
+        self.wcl = False
+        self.startHint = self.hint
+        self.ws = False
+        if self.width == None or self.height == None:
+            if self.hint != '':
+                hintSize = self.font.size(self.hint,self.fontSize)
+            else:
+                hintSize = (150,self.font.size('X',self.fontSize)[1])
+            if self.height == None:
+                self.height = hintSize[1]+10
+            if self.width == None:
+                self.width = hintSize[0]+50
+        self.surface = _s((self.width,self.height))
+        self.wclk = []
+        self.wsnr = False
+    def _generate(self,position=None):
+        self.surface.fill(self.borderColor)
+        if self.focus:
+            self.surface.draw.rect(self.abg,_r(self.borderWidth,self.borderWidth,
+                                self.surface.size[0]-self.borderWidth*2,
+                                self.surface.size[1]-self.borderWidth*2))
+            if self.text == '':
+                text = self.font.render(self.hint,self.fontSize,self.hintColor)
+            else:
+                text = self.font.render(self.text,self.fontSize,self.afg)
+            x = self.surface.size[0]/2-text.size[0]/2
+            if text.size[0] >= self.surface.size[0]-20:
+                x = self.surface.size[0]-text.size[0]-10
+            self.surface.blit(text,(x,self.surface.size[1]/2-text.size[1]/2))
+            for i in _k.getPressed().items():
+                if i[1] and self.focus:
+                    if i[0] in self.blacklist:
+                        continue
+                    if self.whitelist != None:
+                        if i[0] not in self.whitelist:
+                            continue
+                    if self.maxSymbols != None:
+                        if len(i[0]) > self.maxSymbols:
+                            continue
+                    self.text = i[0]
+                    break
+            self.tick += 1
+            if self.tick >= 60:
+                if self.text != '':
+                    points = [[x+text.size[0],self.surface.size[1]/2-text.size[1]/2],
+                              [x+text.size[0],self.surface.size[1]/2-text.size[1]/2+self.surface.size[1]-10]]
+                    self.surface.draw.line(self.lineColor,points[0],points[1],3)
+            if self.tick == 120:
+                self.tick = 0
+        else:
+            self.surface.draw.rect(self.bg,_r(self.borderWidth,self.borderWidth,
+                                self.surface.size[0]-self.borderWidth*2,
+                                self.surface.size[1]-self.borderWidth*2))
+            if self.text == '':
+                text = self.font.render(self.hint,self.fontSize,self.hintColor)
+            else:
+                text = self.font.render(self.text,self.fontSize,self.fg)
+            x = self.surface.size[0]/2-text.size[0]/2
+            if text.size[0] >= self.surface.size[0]-20:
+                x = self.surface.size[0]-text.size[0]-10
+            self.surface.blit(text,(x,self.surface.size[1]/2-text.size[1]/2))
+
+        if position != None:
+            if self.surface.rect(position[0],
+                                 position[1]).contains(_m.getPosition()[0],
+                                                       _m.getPosition()[1]):
+                if not self.wcl:
+                    _m.setCursor(_pg.SYSTEM_CURSOR_HAND)
+                else:
+                    if not self.ws:
+                        _m.setCursor(_pg.SYSTEM_CURSOR_ARROW)
+                        self.ws = True
+                if _m.isPressed('left'):
+                    if not self.wcl:
+                        self.focus=self.focus==0
+                        self.wcl = True
+                else:
+                    self.wcl = False
+                self.wsnr = False
+            else:
+                if not self.wsnr:
+                    _m.setCursor(_pg.SYSTEM_CURSOR_ARROW)
+                    self.wsnr = True
+                if _m.isPressed('left'):
+                    self.focus = False
+    def draw(self, win, pos):
+        self._generate(pos)
+        win.blit(self.surface,pos)
+    def get(self):
+        return self.text
 class image(widget):
     def __init__(self, path):
         self.surface = _l(path)
@@ -263,21 +373,21 @@ class slider(widget):
                  horizontal=True):
         super()._args(locals())
         self.s = False
-        self.x = 0
+        self.x = 12.5
         self._generate(None)
     def _generate(self, pos):
         if self.horizontal:
-            self.surface = _s((self.width+12.5,50))
+            self.surface = _s((self.width,50))
             self.surface.draw.line(self.bg,[12.5,25],[self.width-12.5,25],10)
             self.surface.draw.circle(self.bg,[12.5,26],5)
             self.surface.draw.circle(self.bg,[self.width-12.5,26],5)
-            self.surface.draw.circle(self.fg,[(self.x*((self.width-25)/self.width))+12.5,25],12.5)
+            self.surface.draw.circle(self.fg,[self.x,25],12.5)
         else:
-            self.surface = _s((50,self.width+12.5))
+            self.surface = _s((50,self.width))
             self.surface.draw.line(self.bg,[25,12.5],[25,self.width-12.5],10)
             self.surface.draw.circle(self.bg,[26,12.5],5)
             self.surface.draw.circle(self.bg,[26,self.width-12.5],5)
-            self.surface.draw.circle(self.fg,[25,self.x+12.5],12.5)
+            self.surface.draw.circle(self.fg,[25,self.x],12.5)
         if pos != None:
             if _m.isPressed('left'):
                 if self.horizontal:
@@ -286,7 +396,9 @@ class slider(widget):
                               self.surface.size[1])
                     if rect.contains(_m.getPosition()[0],
                                      _m.getPosition()[1]) or self.s:
-                        self.x = _m.getPosition()[0]-pos[0]-5
+                        self.x = _m.getPosition()[0]-pos[0]
+                        if self.x < 12.5: self.x = 12.5
+                        if self.x > self.width-12.5: self.x = self.width-12.5
                         self.s = True
                 else:
                     rect = _r(pos[0],pos[1]+5,
@@ -294,7 +406,9 @@ class slider(widget):
                               self.surface.size[1]-10)
                     if rect.contains(_m.getPosition()[0],
                                      _m.getPosition()[1]) or self.s:
-                        self.x = _m.getPosition()[1]-pos[1]-5
+                        self.x = _m.getPosition()[1]-pos[1]
+                        if self.x < 12.5: self.x = 12.5
+                        if self.x > self.width-12.5: self.x = self.width-12.5
                         self.s = True
             else:
                 self.s = False
