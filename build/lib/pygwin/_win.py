@@ -2,7 +2,7 @@ from pygwin.surface import surface as _surface
 from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
-import pygwin._icon as _icon
+# import pygwin._icon as _icon
 import pygwin.image as _img
 import win32job as _w32j
 import win32api as _w32a
@@ -104,13 +104,13 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             _pg.display.set_caption(title)
         if icon != None:
             _pg.display.set_icon(_pg.image.load(icon))
-        else:
-            surf = _img.fromBytes(_icon.iconbytes)
-            try:
-                orig = surf._surface_orig
-            except:
-                orig = surf._orig
-            _pg.display.set_icon(orig)
+        # else:
+        #     surf = _img.fromBytes(_icon.iconbytes)
+        #     try:
+        #         orig = surf._surface_orig
+        #     except:
+        #         orig = surf._orig
+        #     _pg.display.set_icon(orig)
     return win()
 
 def ramLimit(memory_limit):

@@ -1,0 +1,6 @@
+cython
+pywin32
+pygame
+inputs
+pydub
+kivy
