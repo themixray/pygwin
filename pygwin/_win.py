@@ -3,7 +3,6 @@ from pygwin.tray import tray as _tray
 from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
-import pygwin._icon as _icon
 import pygwin.image as _img
 import win32job as _w32j
 import win32api as _w32a
@@ -30,7 +29,7 @@ class win(_surface):
         _pg.display.update()
     def title():
         def fget(self):
-            return _pg.display.get_caption()
+            return _pg.display.get_caption()[0]
         def fset(self, value):
             if type(value) != str:
                 return
@@ -109,15 +108,7 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             _pg.display.set_caption(title)
         if icon != None:
             _pg.display.set_icon(_pg.image.load(icon))
-            return win(icon)
-        else:
-            surf = _img.fromBytes(_icon.iconbytes)
-            try:
-                orig = surf._surface_orig
-            except:
-                orig = surf._orig
-            _pg.display.set_icon(orig)
-    return win()
+    return win(icon)
 
 def ramLimit(memory_limit):
     hjob = _w32j.CreateJobObject(None, job_name)
