@@ -1,8 +1,9 @@
 from pygwin.surface import surface as _surface
+from pygwin.tray import tray as _tray
 from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
-# import pygwin._icon as _icon
+import pygwin._icon as _icon
 import pygwin.image as _img
 import win32job as _w32j
 import win32api as _w32a
@@ -13,12 +14,14 @@ import tempfile as _tf
 import pickle as _p
 
 class win(_surface):
-    def __init__(self):
+    def __init__(self, iconpath):
         self._orig = _pg.display.get_surface()
         super().__init__(self._orig.get_size())
         self._orig = _pg.display.get_surface()
         self._clock = _pg.time.Clock()
         self._withfps = False
+        self._iconpath = iconpath
+        self.tray = _tray(_pg.display.get_caption(),self._iconpath)
     def update(self, fps=-1):
         if fps != -1:
             self._clock.tick(fps)
@@ -37,6 +40,7 @@ class win(_surface):
     title = property(**title())
     def icon(value):
         _pg.display.set_icon(_pg.image.load(value))
+        self._iconpath = iconpath
     def size():
         def fget(self):
             return _pg.display.get_window_size()
@@ -104,13 +108,14 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             _pg.display.set_caption(title)
         if icon != None:
             _pg.display.set_icon(_pg.image.load(icon))
-        # else:
-        #     surf = _img.fromBytes(_icon.iconbytes)
-        #     try:
-        #         orig = surf._surface_orig
-        #     except:
-        #         orig = surf._orig
-        #     _pg.display.set_icon(orig)
+        else:
+            surf = _img.fromBytes(_icon.iconbytes)
+            try:
+                orig = surf._surface_orig
+            except:
+                orig = surf._orig
+            _pg.display.set_icon(orig)
+            return win(icon)
     return win()
 
 def ramLimit(memory_limit):

@@ -3,4 +3,4 @@ pywin32
 pygame
 inputs
 pydub
-kivy
+wxPython

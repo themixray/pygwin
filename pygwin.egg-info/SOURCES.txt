@@ -2,6 +2,7 @@ setup.py
 pygwin/__init__.py
 pygwin/_icon.py
 pygwin/_pg.py
+pygwin/_tray.py
 pygwin/_win.py
 pygwin/console.py
 pygwin/font.py
