@@ -1,5 +1,5 @@
 from pygwin.surface import surface as _surface
-from pygwin.tray import tray as _tray
+from pygwin._tray import tray as _tray
 from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
