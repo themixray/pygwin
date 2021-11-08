@@ -2,7 +2,6 @@ setup.py
 pygwin/__init__.py
 pygwin/_icon.py
 pygwin/_pg.py
-pygwin/_tray.py
 pygwin/_win.py
 pygwin/console.py
 pygwin/font.py
@@ -13,6 +12,7 @@ pygwin/mixer.py
 pygwin/mouse.py
 pygwin/rect.py
 pygwin/surface.py
+pygwin/tray.py
 pygwin/ui.py
 pygwin.egg-info/PKG-INFO
 pygwin.egg-info/SOURCES.txt

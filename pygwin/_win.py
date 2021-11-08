@@ -1,5 +1,5 @@
 from pygwin.surface import surface as _surface
-from pygwin._tray import tray as _tray
+from pygwin.tray import tray as _tray
 from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
@@ -21,7 +21,7 @@ class win(_surface):
         self._clock = _pg.time.Clock()
         self._withfps = False
         self._iconpath = iconpath
-        self.tray = _tray(_pg.display.get_caption(),self._iconpath)
+        self.tray = _tray(self.title,iconpath)
     def update(self, fps=-1):
         if fps != -1:
             self._clock.tick(fps)
@@ -108,6 +108,7 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             _pg.display.set_caption(title)
         if icon != None:
             _pg.display.set_icon(_pg.image.load(icon))
+            return win(icon)
         else:
             surf = _img.fromBytes(_icon.iconbytes)
             try:
@@ -115,7 +116,6 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             except:
                 orig = surf._orig
             _pg.display.set_icon(orig)
-            return win(icon)
     return win()
 
 def ramLimit(memory_limit):
