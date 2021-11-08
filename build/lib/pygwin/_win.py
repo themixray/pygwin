@@ -14,14 +14,15 @@ import tempfile as _tf
 import pickle as _p
 
 class win(_surface):
-    def __init__(self, iconpath):
+    def __init__(self, iconpath=None):
         self._orig = _pg.display.get_surface()
         super().__init__(self._orig.get_size())
         self._orig = _pg.display.get_surface()
         self._clock = _pg.time.Clock()
         self._withfps = False
         self._iconpath = iconpath
-        self.tray = _tray(self.title,iconpath)
+        if iconpath != None:
+            self.tray = _tray(self.title,iconpath)
     def update(self, fps=-1):
         if fps != -1:
             self._clock.tick(fps)
