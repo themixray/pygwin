@@ -15,14 +15,12 @@ class font:
         font.set_underline(underline)
         if text.replace('\n', '') != text:
             text = text.split('\n')
-            surf = _pg.Surface([
-                font.size(max(text, key=len))[0],
-                (font.size('123')[1]+newLineSpace)*len(text)],
-                                  pygame.SRCALPHA)
+            surf = _pg.Surface([font.size(max(text,key=lambda x:font.size(x)[0]))[0],
+                                (font.size('123')[1]+newLineSpace)*len(text)],_pg.SRCALPHA)
             y = 0
             for i in text:
                 r = font.render(i, True, color)
-                surf.blit(r, (r.get_rect(center=(int(surf.get_width()/2),y)).x, y))
+                surf.blit(r, (0, y))
                 y += font.size(i)[1]
                 if i != text[-1]:
                     y += newLineSpace

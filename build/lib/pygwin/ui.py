@@ -208,9 +208,12 @@ class entry(widget):
     def insert(self,text):
         if _ct.WinDLL("User32.dll").GetKeyState(0x14):
             text = text.upper()
+        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
+            text = text.translate(dict(zip(map(ord, '''1234567890-=[]\\;'''+"',./`"),
+                                                    '''!@#$%^&*()_+{}|:"<>?~''')))
         if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
             text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-                               '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+                                                    '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
         if text in self.blacklist:
             return
         if self.whitelist != None:
@@ -226,7 +229,7 @@ class entry(widget):
         self._generate(pos)
         win.blit(self.surface,pos)
     def get(self):
-        return text
+        return self.text
 class textarea(widget):
     def __init__(self,hint='',fontSize=30,
                  font=_df,width=None,bg=(70,70,70),
@@ -243,14 +246,13 @@ class textarea(widget):
         self.wcl = False
         self.startHint = self.hint
         self.ws = False
+        if self.hint != '':
+            hintSize = self.font.size(self.hint,self.fontSize)
+        else:
+            hintSize = (150,self.font.size('X',self.fontSize)[1])
+        self.height = hintSize[1]+10
         if self.width == None:
-            if self.hint != '':
-                hintSize = self.font.size(self.hint,self.fontSize)
-            else:
-                hintSize = (150,self.font.size('X',self.fontSize)[1])
-            self.height = hintSize[1]+10
-            if self.width == None:
-                self.width = hintSize[0]+50
+            self.width = hintSize[0]+50
         self.surface = _s((self.width,self.height))
         self.wclk = []
         self.wsnr = False
@@ -268,9 +270,13 @@ class textarea(widget):
                 text = self.font.render(self.hint,self.fontSize,self.hintColor)
             else:
                 text = self.font.render(self.text,self.fontSize,self.afg)
+            try:
+                last = self.text.split('\n')[-1]
+            except:
+                last = self.text
             x = 10
-            if text.size[0] >= self.surface.size[0]-20:
-                x = self.surface.size[0]-text.size[0]-10
+            if self.font.size(last,self.fontSize)[0] >= self.surface.size[0]-20:
+                x = self.surface.size[0]-self.font.size(last,self.fontSize)[0]
             self.surface.blit(text,(x,self.surface.size[1]/2-text.size[1]/2))
             for i in _k.getPressed().items():
                 if i[1]:
@@ -293,8 +299,8 @@ class textarea(widget):
             self.tick += 1
             if self.tick >= 60:
                 if self.text != '':
-                    points = [[x+text.size[0],self.surface.size[1]/2-text.size[1]/2],
-                              [x+text.size[0],self.surface.size[1]/2-text.size[1]/2+self.surface.size[1]-10]]
+                    points = [[x+self.font.size(last,self.fontSize)[0],self.surface.size[1]-(self.font.size('X',self.fontSize)[1]+10)],
+                              [x+self.font.size(last,self.fontSize)[0],self.surface.size[1]/2-text.size[1]/2+self.surface.size[1]-10]]
                     self.surface.draw.line(self.lineColor,points[0],points[1],3)
             if self.tick == 120:
                 self.tick = 0
@@ -306,9 +312,13 @@ class textarea(widget):
                 text = self.font.render(self.hint,self.fontSize,self.hintColor)
             else:
                 text = self.font.render(self.text,self.fontSize,self.fg)
+            try:
+                last = self.text.split('\n')[-1]
+            except:
+                last = self.text
             x = self.surface.size[0]/2-text.size[0]/2
-            if text.size[0] >= self.surface.size[0]-20:
-                x = self.surface.size[0]-text.size[0]-10
+            if self.font.size(last,self.fontSize)[0] >= self.surface.size[0]-20:
+                x = self.surface.size[0]-self.font.size(last,self.fontSize)[0]
             self.surface.blit(text,(x,self.surface.size[1]/2-text.size[1]/2))
 
         if position != None:
@@ -337,6 +347,9 @@ class textarea(widget):
     def insert(self,text):
         if _ct.WinDLL("User32.dll").GetKeyState(0x14):
             text = text.upper()
+        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
+            text = text.translate(dict(zip(map(ord, '''1234567890-=[]\\;'''+"',./`"),
+                                                    '''!@#$%^&*()_+{}|:"<>?~''')))
         if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
             text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
                                '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
@@ -355,7 +368,7 @@ class textarea(widget):
         self._generate(pos)
         win.blit(self.surface,pos)
     def get(self):
-        return text
+        return self.text
 class keySelect(entry):
     def __init__(self,keyBefore='',
                  fontSize=30,font=_df,
@@ -629,3 +642,5 @@ class menu:
         return self._page
     def getWidgets(self, page=0):
         return self._widgets[page]
+    def setWidgetPos(self,index,pos,page=0):
+        self._widgets[page][index] = [self._widgets[page][index][0], pos]
