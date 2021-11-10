@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: pygwin0
+Version: 0.0.1
+Summary: A library for creating Python applications.
+Home-page: https://github.com/themixray/pygwin
+Author: themixray
+Author-email: simindeymo@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/themixray/pygwin/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# PyGWin
+A library for creating Python applications.
+
+[Documentation](https://github.com/themixray/pygwin/wiki)
+

@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+src/pygwin0.egg-info/PKG-INFO
+src/pygwin0.egg-info/SOURCES.txt
+src/pygwin0.egg-info/dependency_links.txt
+src/pygwin0.egg-info/top_level.txt
