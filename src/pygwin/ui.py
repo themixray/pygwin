@@ -624,6 +624,15 @@ class checkBox(widget):
     def draw(self, win, pos):
         self._generate(pos)
         win.blit(self.surface,pos)
+# class colorPicker(widget):
+#     def __init__(self):
+#         self._generate()
+#     def _generate(self, position=None):
+#         self.surface = _s((255,self.width))
+#
+#     def draw(self, win, pos):
+#         self._generate(pos)
+#         win.blit(self.surface,pos)
 class base:
     def __init__(self, win, bg=(128,128,128)):
         self._widgets = {}

@@ -60,3 +60,4 @@ class console:
         self.focus()
         pag.screenshot(path, region=rect)
         return path
+console = console()
