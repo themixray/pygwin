@@ -1,4 +1,12 @@
-# PyGWin
-A library for creating Python applications.
+<h1 align="center">
+  PyGWin
+</h1>
+<p align="center">
+  A library for creating Python applications.
+</p>
 
-[Documentation](https://github.com/themixray/pygwin/wiki)
+<p align="center">
+  <a href="https://github.com/themixray/pygwin/wiki">
+    Documentation
+  </a>
+</p>
