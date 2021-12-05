@@ -1,6 +1,6 @@
 import pygwin
 
-win = pygwin.create('UI Example',(270,350))
+win = pygwin.create('UI example',(270,350))
 base = pygwin.ui.base(win)
 
 lbl = pygwin.ui.label('Label')
@@ -21,6 +21,10 @@ ta.focus = True
 ta._generate()
 ta.focus = False
 base.put(ta,(10,255))
+tta = pygwin.ui.tip('textarea',
+                    *ta.surface.size,
+                    waitBeforeShowing=30)
+base.put(tta,(10,255))
 
 run = True
 while run:
@@ -34,5 +38,6 @@ while run:
         loadbar.step()
         if loadbar.get() == loadbar.length:
             loadbar.set(0)
+    tta.responceWidth,tta.responceHeight=ta.surface.size
     win.update(30)
 pygwin.close()
