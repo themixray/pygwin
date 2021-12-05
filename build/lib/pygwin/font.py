@@ -30,7 +30,7 @@ class font:
         surface._surface_orig = surf
         return surface
     def size(self, text, size, newLineSpace=5,
-             italic=False, bold=False, underline=False):
+             italic=False,bold=False,underline=False):
         return self.render(text, size, (255,255,255),
                            newLineSpace=newLineSpace,
                            italic=italic, bold=bold,
