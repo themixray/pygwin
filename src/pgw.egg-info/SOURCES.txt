@@ -18,6 +18,7 @@ src/pygwin/image.py
 src/pygwin/keyboard.py
 src/pygwin/mixer.py
 src/pygwin/mouse.py
+src/pygwin/record.py
 src/pygwin/rect.py
 src/pygwin/surface.py
 src/pygwin/tray.py

@@ -5,3 +5,7 @@ inputs
 pydub
 wxPython
 pyautogui
+moviepy
+pipwin
+wave
+opencv-python
