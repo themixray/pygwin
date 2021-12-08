@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: pgw
+Version: 0.0.3
+Summary: A library for creating Python applications.
+Home-page: https://github.com/themixray/pygwin
+Author: themixray
+Author-email: simindeymo@gmail.com
+License: MIT
+Project-URL: Bug Tracker, https://github.com/themixray/pygwin/issues
+Project-URL: Wiki, https://github.com/themixray/pygwin/wiki
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+<h1 align="center">
+  PyGWin
+</h1>
+<p align="center">
+  A library for creating Python applications.
+</p>
+
+<p align="center">
+  <a href="https://github.com/themixray/pygwin/wiki">
+    Documentation
+  </a>
+</p>
+
+

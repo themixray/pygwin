@@ -211,12 +211,14 @@ class entry(widget):
     def insert(self,text):
         if _ct.WinDLL("User32.dll").GetKeyState(0x14):
             text = text.upper()
-        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
-            text = text.translate(dict(zip(map(ord, '''1234567890-=[]\\;'''+"',./`"),
-                                                    '''!@#$%^&*()_+{}|:"<>?~''')))
         if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
-            text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-                                                    '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+            text = text.translate(dict(zip(map(ord,
+            '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOPASDFGHJKLZXCVBNM'''),
+            '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗФЫВАПРОЛДЯЧСМИТЬ''')))
+        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
+            text = text.translate(dict(zip(map(ord,
+            u'''1234567890-=[]\;',./`'''),
+            u'''!@#$%^&*()_+{}|:"<>?~''')))
         if text in self.blacklist:
             return
         if self.whitelist != None:
@@ -304,8 +306,10 @@ class textarea(widget):
             self.tick += 1
             if self.tick >= 60:
                 if self.text != '':
-                    points = [[x+self.font.size(last,self.fontSize)[0],self.surface.size[1]-(self.font.size('X',self.fontSize)[1])],
-                              [x+self.font.size(last,self.fontSize)[0],self.surface.size[1]/2-text.size[1]/2+self.surface.size[1]-10]]
+                    points = [[x+self.font.size(last,self.fontSize)[0],
+                               self.surface.size[1]-(self.font.size('X',self.fontSize)[1])],
+                              [x+self.font.size(last,self.fontSize)[0],
+                               self.surface.size[1]/2-text.size[1]/2+self.surface.size[1]-10]]
                     self.surface.draw.line(self.lineColor,points[0],points[1],3)
             if self.tick == 120:
                 self.tick = 0
@@ -355,9 +359,11 @@ class textarea(widget):
         if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
             text = text.translate(dict(zip(map(ord, '''1234567890-=[]\\;'''+"',./`"),
                                                     '''!@#$%^&*()_+{}|:"<>?~''')))
-        if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
-            text = text.translate(dict(zip(map(ord, '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-                               '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+        if hex(getattr(_ct.windll.LoadLibrary("user32.dll"),
+                       "GetKeyboardLayout")(0))=='0x4190419':
+            text = text.translate(dict(zip(map(ord,
+            '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
+            '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
         if text in self.blacklist:
             return
         if self.whitelist != None:
@@ -612,15 +618,19 @@ class checkBox(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.x:
-                self.surface.draw.line(self.afg,[self.borderWidth,self.width/2+self.borderWidth],[self.width/2,self.width-self.borderWidth],self.borderWidth)
-                self.surface.draw.line(self.afg,[self.width/2,self.width-self.borderWidth],[self.width-self.borderWidth,self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.afg,[self.borderWidth,self.width/2+self.borderWidth],
+                                       [self.width/2,self.width-self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.afg,[self.width/2,self.width-self.borderWidth],
+                                       [self.width-self.borderWidth,self.borderWidth],self.borderWidth)
         else:
             self.surface.draw.rect(self.bg,_r(self.borderWidth,self.borderWidth,
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.x:
-                self.surface.draw.line(self.fg,[self.borderWidth,self.width/2+self.borderWidth],[self.width/2,self.width-self.borderWidth],self.borderWidth)
-                self.surface.draw.line(self.fg,[self.width/2,self.width-self.borderWidth],[self.width-self.borderWidth,self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.fg,[self.borderWidth,self.width/2+self.borderWidth],
+                                       [self.width/2,self.width-self.borderWidth],self.borderWidth)
+                self.surface.draw.line(self.fg,[self.width/2,self.width-self.borderWidth],
+                                       [self.width-self.borderWidth,self.borderWidth],self.borderWidth)
     def draw(self, win, pos):
         self._generate(pos)
         win.blit(self.surface,pos)
@@ -633,6 +643,51 @@ class checkBox(widget):
 #     def draw(self, win, pos):
 #         self._generate(pos)
 #         win.blit(self.surface,pos)
+class tip(widget):
+    def __init__(self,text,responceWidth,responceHeight,fontSize=15,font=_df,
+                 borderColor=(180,180,50),borderWidth=2,bg=(255,255,128),
+                 fg=(35,35,5),waitBeforeShowing=0,
+                 tipPosRelativeCursor=(10,10)):
+        super()._args(locals())
+        self.tick = -1
+        self.lcp = (0,0)
+        self.tprc = self.tipPosRelativeCursor
+        self._generate()
+    def _generate(self, position=None):
+        self.surface = _s((self.responceWidth,
+                           self.responceHeight))
+        if position != None:
+            self.tick += 1
+            if self.lcp != _m.getPosition():
+                self.tick = 0
+                self.lcp = _m.getPosition()
+            if self.tick >= self.waitBeforeShowing:
+                mp = _m.getPosition()
+                mp = [mp[0]+self.tprc[0]-position[0],
+                      mp[1]+self.tprc[1]-position[1]]
+                rect = _r(mp[0],mp[1],
+                self.font.size(self.text,self.fontSize)[0]+4,
+                self.font.size(self.text,self.fontSize)[1]+6)
+                if mp[0]<0 or mp[1]<0:return
+                if mp[0]>self.responceWidth:return
+                if mp[1]>self.responceHeight:return
+                if mp[0]>self.responceWidth-rect.w:
+                    mp[0]=self.responceWidth-rect.w
+                if mp[1]>self.responceHeight-rect.h:
+                    mp[1]=self.responceHeight-rect.h
+                rect = _r(mp[0],mp[1],
+                self.font.size(self.text,self.fontSize)[0]+4,
+                self.font.size(self.text,self.fontSize)[1]+6)
+                self.surface.draw.rect(self.bg,rect)
+                self.surface.draw.rect(
+                self.borderColor,rect,self.borderWidth)
+                ts = self.font.render(
+                self.text,self.fontSize,self.fg)
+                self.surface.blit(ts,(mp[0]+2,mp[1]+3))
+    def draw(self, win, pos):
+        self._generate(pos)
+        win.blit(self.surface,pos)
+
 class base:
     def __init__(self, win, bg=(128,128,128)):
         self._widgets = {}

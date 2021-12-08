@@ -211,13 +211,14 @@ class entry(widget):
     def insert(self,text):
         if _ct.WinDLL("User32.dll").GetKeyState(0x14):
             text = text.upper()
-        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
-            text = text.translate(dict(zip(map(ord,
-            '''1234567890-=[]\\;'''+"',./`"),'''!@#$%^&*()_+{}|:"<>?~''')))
         if hex(getattr(_ct.windll.LoadLibrary("user32.dll"), "GetKeyboardLayout")(0))=='0x4190419':
             text = text.translate(dict(zip(map(ord,
-            '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~'''),
-            '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё''')))
+            '''qwertyuiop[]asdfghjkl;'zxcvbnm,./`QWERTYUIOPASDFGHJKLZXCVBNM'''),
+            '''йцукенгшщзхъфывапролджэячсмитьбю.ёЙЦУКЕНГШЩЗФЫВАПРОЛДЯЧСМИТЬ''')))
+        if _pg.key.get_pressed()[_pg.K_LSHIFT] or _pg.key.get_pressed()[_pg.K_RSHIFT]:
+            text = text.translate(dict(zip(map(ord,
+            u'''1234567890-=[]\;',./`'''),
+            u'''!@#$%^&*()_+{}|:"<>?~''')))
         if text in self.blacklist:
             return
         if self.whitelist != None:

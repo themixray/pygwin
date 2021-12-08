@@ -1,0 +1,7 @@
+cython
+pywin32
+pygame
+inputs
+pydub
+wxPython
+pyautogui

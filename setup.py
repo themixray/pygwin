@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='pgw',packages=['pygwin'],version='0.0.1',author='themixray',
+setup(name='pgw',packages=['pygwin'],version='0.0.3',author='themixray',
     description='A library for creating Python applications.',
     license='MIT',install_requires=['cython','pywin32','pygame',
     'inputs','pydub','wxPython','pyautogui'])
