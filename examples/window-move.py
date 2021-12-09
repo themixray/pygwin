@@ -30,7 +30,7 @@ while run:
 
     win.blit(score,(0,0))
 
-    set_position = win.position
+    set_position = list(win.position)
     if pygwin.keyboard.isPressed('w'):
         player[1] -= 5
         set_position[1] -= 5 # Move window up
