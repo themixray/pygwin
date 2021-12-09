@@ -30,18 +30,20 @@ while run:
 
     win.blit(score,(0,0))
 
+    set_position = win.position
     if pygwin.keyboard.isPressed('w'):
         player[1] -= 5
-        win.move(win.position[0],win.position[1]-5) # Move window up
+        set_position[1] -= 5 # Move window up
     if pygwin.keyboard.isPressed('s'):
         player[1] += 5
-        win.move(win.position[0],win.position[1]+5) # Move window down
+        set_position[1] += 5 # Move window down
     if pygwin.keyboard.isPressed('d'):
         player[0] += 5
-        win.move(win.position[0]+5,win.position[1]) # Move window right
+        set_position[0] += 5 # Move window right
     if pygwin.keyboard.isPressed('a'):
         player[0] -= 5
-        win.move(win.position[0]-5,win.position[1]) # Move window left
+        set_position[0] -= 5 # Move window left
+    win.move(*set_position) # Set position
 
     if playerRect.collide(apple):
         apple = pygwin.rect(random.randint(50,490),
