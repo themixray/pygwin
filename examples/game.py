@@ -15,10 +15,6 @@ while run: # Creating loop
             run = False # Break loop
     win.fill((255,255,255)) # Fill window with color
 
-    playerRect = pygwin.rect(player[0]-10,player[1]-10,20,20) # Player rect
-    win.draw.rect((0,0,0),playerRect) # Drawing player rect
-    win.draw.rect((200,50,50),apple) # Drawing apple rect
-
     win.blit(score,(0,0)) # Writing player score
 
     if pygwin.keyboard.isPressed('w'): # If keyboard key w pressed
@@ -38,6 +34,10 @@ while run: # Creating loop
         player[0] = -10 # Set player position in left
     if player[1] > 510: # If player out of the screen (down)
         player[1] = -10 # Set player position in up
+
+    playerRect = pygwin.rect(player[0]-10,player[1]-10,20,20) # Player rect
+    win.draw.rect((0,0,0),playerRect) # Drawing player rect
+    win.draw.rect((200,50,50),apple) # Drawing apple rect
 
     if playerRect.collide(apple): # If player rect collide apple rect
         apple = pygwin.rect(random.randint(0,490),
