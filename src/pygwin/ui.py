@@ -108,7 +108,7 @@ class label(widget):
         self.surface = font.render(text,size,color)
 class entry(widget):
     def __init__(self,hint='',fontSize=30,font=_df,
-                 width=None,height=None,hide=True
+                 width=None,height=None,hide=False,
                  bg=(70,70,70),fg=(180,180,200),
                  afg=(200,200,200),abg=(50,50,50),
                  hintColor=(100,100,100),
