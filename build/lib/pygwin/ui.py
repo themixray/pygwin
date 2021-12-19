@@ -142,12 +142,12 @@ class entry(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.text == '':
-                if self.hide:
+                if not self.hide:
                     text = self.font.render(self.hint,self.fontSize,self.hintColor)
                 else:
                     text = self.font.render('*'*len(self.hint),self.fontSize,self.hintColor)
             else:
-                if self.hide:
+                if not self.hide:
                     text = self.font.render(self.text,self.fontSize,self.afg)
                 else:
                     text = self.font.render('*'*len(self.text),self.fontSize,self.afg)
@@ -183,7 +183,7 @@ class entry(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.text == '':
-                if self.hide:
+                if not self.hide:
                     text = self.font.render(self.hint,self.fontSize,self.hintColor)
                 else:
                     text = self.font.render('*'*len(self.hint),self.fontSize,self.hintColor)
