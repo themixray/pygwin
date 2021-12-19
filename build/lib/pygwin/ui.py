@@ -108,7 +108,7 @@ class label(widget):
         self.surface = font.render(text,size,color)
 class entry(widget):
     def __init__(self,hint='',fontSize=30,font=_df,
-                 width=None,height=None,
+                 width=None,height=None,hide=True
                  bg=(70,70,70),fg=(180,180,200),
                  afg=(200,200,200),abg=(50,50,50),
                  hintColor=(100,100,100),
@@ -142,9 +142,15 @@ class entry(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.text == '':
-                text = self.font.render(self.hint,self.fontSize,self.hintColor)
+                if self.hide:
+                    text = self.font.render(self.hint,self.fontSize,self.hintColor)
+                else:
+                    text = self.font.render('*'*len(self.hint),self.fontSize,self.hintColor)
             else:
-                text = self.font.render(self.text,self.fontSize,self.afg)
+                if self.hide:
+                    text = self.font.render(self.text,self.fontSize,self.afg)
+                else:
+                    text = self.font.render('*'*len(self.text),self.fontSize,self.afg)
             x = 10
             if text.size[0] >= self.surface.size[0]-20:
                 x = self.surface.size[0]-text.size[0]-10
@@ -177,9 +183,15 @@ class entry(widget):
                                 self.surface.size[0]-self.borderWidth*2,
                                 self.surface.size[1]-self.borderWidth*2))
             if self.text == '':
-                text = self.font.render(self.hint,self.fontSize,self.hintColor)
+                if self.hide:
+                    text = self.font.render(self.hint,self.fontSize,self.hintColor)
+                else:
+                    text = self.font.render('*'*len(self.hint),self.fontSize,self.hintColor)
             else:
-                text = self.font.render(self.text,self.fontSize,self.fg)
+                if self.hide:
+                    text = self.font.render(self.text,self.fontSize,self.fg)
+                else:
+                    text = self.font.render('*'*len(self.text),self.fontSize,self.fg)
             x = self.surface.size[0]/2-text.size[0]/2
             if text.size[0] >= self.surface.size[0]-20:
                 x = self.surface.size[0]-text.size[0]-10

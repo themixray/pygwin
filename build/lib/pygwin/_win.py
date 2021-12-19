@@ -36,7 +36,7 @@ class _win(_surface):
         if size == None:
             return self.size
         else:
-            self._orig = _pg.display.set_mode(value)
+            self._orig = _pg.display.set_mode(size)
     def title():
         def fget(self):
             return _pg.display.get_caption()[0]
