@@ -8,6 +8,7 @@ requires = [
     "inputs",
     "pillow",
     "wxPython",
+    "randstr",
     "setuptools >=42"
 ]
 build-backend = "setuptools.build_meta"

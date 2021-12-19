@@ -1,6 +1,7 @@
 from pygwin.surface import surface
 import pygwin.keyboard as keyboard
 from pygwin.console import console
+from pygwin.color import color
 import pygwin.gamepad as _gp
 import pygwin.mouse as mouse
 from pygwin.rect import rect

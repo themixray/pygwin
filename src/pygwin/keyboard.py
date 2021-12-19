@@ -8,3 +8,15 @@ def getPressed():
     return fkeys
 def isPressed(key):
     return getPressed()[key]
+
+import inspect as _i
+
+_aliases = {'getPressed':['gprs','getkeys'],
+            'isPressed':['isprs','keyprs']}
+
+for i in _aliases.items():
+    exec(f'args = _i.signature({i[0]})')
+    args = [str(i[1]) for i in dict(args.parameters).items()]
+    args = ', '.join(args)
+    for i0 in i[1]:
+        exec(f"def {i0}({args}):return {i[0]}({args})")

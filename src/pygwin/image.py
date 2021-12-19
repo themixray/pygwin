@@ -1,19 +1,26 @@
 from pygwin._pg import pg as _pg
 from pygwin.surface import surface as _surface
 from PIL import Image as _im
+import tempfile as _tf
+import randstr as _rs
 import pickle as _p
 import bz2 as _bz2
+import os as _os
 
 def load(path):
     if path.endswith('.gif'):
         im = _im.open(path)
-        surfs = []
-        for i in range(im.n_frames):
-            im.seek(i)
-            image = _pg.image.fromstring(im.tobytes(),im.size,im.mode)
-            surf = _surface(image.get_size())
-            surf._surface_orig = image
-            surfs.append(surf)
+        with _tf.TemporaryDirectory() as td:
+            surfs = []
+            for i in range(im.n_frames):
+                im.seek(i)
+                p = _os.path.join(td,f'{i}.png')
+                im.save(p)
+                s = _pg.image.load(p)
+                _os.remove(p)
+                sg = _surface(s.get_size())
+                sg.blit(s,(0,0))
+                surfs.append(sg)
         return surfs
     else:
         im = _im.open(path.encode('utf8').decode('utf8'))
@@ -23,18 +30,10 @@ def load(path):
         return surf
 
 def save(surface, dest):
-    if type(surface) == _surface:
-        orig = surface._surface_orig
-    else:
-        orig = surface._orig
-    _pg.image.save_extended(orig, dest)
+    _pg.image.save_extended(surface._grp(), dest)
 
 def toBytes(surface):
-    try:
-        orig = surface._surface_orig
-    except:
-        orig = surface._orig
-    return _bz2.compress(_p.dumps([_pg.image.tostring(orig,"RGBA"),list(surface.size)]))
+    return _bz2.compress(_p.dumps([_pg.image.tostring(surface._grp(),"RGBA"),list(surface.size)]))
 
 def fromBytes(bytes):
     string = _p.loads(_bz2.decompress(bytes))

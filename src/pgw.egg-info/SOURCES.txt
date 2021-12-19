@@ -11,6 +11,7 @@ src/pgw.egg-info/top_level.txt
 src/pygwin/__init__.py
 src/pygwin/_pg.py
 src/pygwin/_win.py
+src/pygwin/color.py
 src/pygwin/console.py
 src/pygwin/font.py
 src/pygwin/gamepad.py

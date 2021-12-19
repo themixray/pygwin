@@ -1,5 +1,11 @@
 from pygwin.rect import rect as _r
+from pygwin.color import color as _clr
 from pygwin._pg import pg as _pg
+from PIL import Image as _im
+import tempfile as _tf
+import randstr as _rs
+import time as _t
+import os as  _os
 
 class surface:
     def __init__(self, size):
@@ -8,15 +14,16 @@ class surface:
     @property
     def pixels(self):
         pixels = []
-        pxls = _pg.PixelArray(self._orig)
         for x in range(self.size[0]):
             pixels.append([])
             for y in range(self.size[1]):
-                pixels[x].append(pxls[x, y])
+                pixels[x].append(self.getPixel(x,y))
         return pixels
     @property
     def size(self):
         return self._size
+    def _grp(self):
+        return self._orig
     def rect(self, x=0, y=0, center=[]):
         if center == []:
             return _r(x, y, self.size[0], self.size[1])
@@ -30,7 +37,7 @@ class surface:
         surf._surface_size = self._size
         return surf
     def getPixel(self, x, y):
-        return self._orig.get_at((x,y))
+        return _clr(*self._orig.get_at((x,y)))
     def setPixel(self, x, y, color):
         self._orig.set_at((x,y),color)
         return self.copy()
@@ -47,10 +54,10 @@ class surface:
                 self._orig.blit(surf, xy)
         return self.copy()
     def fill(self, color):
-        self._orig.fill(color)
+        self._orig.fill(list(color))
         return self.copy()
     def crop(self, rect):
-        self._orig = self._orig.subsurface((rect.x,rect.y,rect.w,rect.h))
+        self._orig = self._orig.subsurface(rect)
         self._size = self._orig.get_size()
         return self.copy()
     def scale(self, size, smooth=False):
@@ -75,6 +82,7 @@ class surface:
         self._orig = _pg.transform.smoothscale(self._orig,scale)
         self._orig = _pg.transform.smoothscale(self._orig,size)
         return self.copy()
+
     class _draw:
         def __init__(self,surface):
             self._surf = surface
@@ -88,10 +96,9 @@ class surface:
                 orig = self._surf._surface_orig
             except:
                 orig = self._surf._orig
-            _pg.draw.rect(orig,color,_pg.Rect(rect.x,rect.y,rect.w,rect.h),
-                         width,borderRadius,borderTopLeftRadius,
-                         borderTopRightRadius,borderBottomLeftRadius,
-                         borderBottomRightRadius)
+            _pg.draw.rect(orig,color,_pg.Rect(rect[0],rect[1],rect[2],rect[3]),
+                         width,borderRadius,borderTopLeftRadius,borderTopRightRadius,
+                         borderBottomLeftRadius,borderBottomRightRadius)
             return self._surf.copy()
         def polygon(self, color, points, width=0):
             try:
@@ -119,7 +126,8 @@ class surface:
                 orig = self._surf._surface_orig
             except:
                 orig = self._surf._orig
-            _pg.draw.ellipse(orig,color,_pg.Rect(rect.x,rect.y,rect.w,rect.h),width)
+            _pg.draw.ellipse(orig,color,_pg.Rect(rect[0],
+                            rect[1],rect[2],rect[3]),width)
             return self._surf.copy()
         def line(self,color,start,end,width=1):
             try:
@@ -133,8 +141,8 @@ class surface:
                 orig = self._surf._surface_orig
             except:
                 orig = self._surf._orig
-            _pg.draw.arc(orig,color,
-                        _pg.Rect(rect.x,rect.y,rect.w,rect.h),
+            _pg.draw.arc(orig,color,_pg.Rect(rect[0],
+                        rect[1],rect[2],rect[3]),
                         startAngle,stopAngle,width)
             return self._surf.copy()
     @property

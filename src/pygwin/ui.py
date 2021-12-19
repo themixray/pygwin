@@ -703,7 +703,7 @@ class base:
                 self._widgets[self._page].remove(i)
     def put(self, widget, pos, page=0):
         if page not in self._widgets:
-            self._widgets.update({page:[]})
+            self.blankPage(page)
         self._widgets[page].append([widget, pos])
     def selectPage(self, page):
         self._page = page
@@ -713,3 +713,5 @@ class base:
         return self._widgets[page]
     def setWidgetPos(self,index,pos,page=0):
         self._widgets[page][index] = [self._widgets[page][index][0], pos]
+    def blankPage(self,page):
+        self._widgets.update({page:[]})

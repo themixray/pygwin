@@ -10,9 +10,12 @@ import win32con as _w32c
 import win32gui as _w32g
 import requests as _req
 import tempfile as _tf
+import threading as _t
 import pickle as _p
+import mouse as _m
+import time as _ti
 
-class win(_surface):
+class _win(_surface):
     def __init__(self, iconpath=None):
         self._orig = _pg.display.get_surface()
         super().__init__(self._orig.get_size())
@@ -20,6 +23,8 @@ class win(_surface):
         self._clock = _pg.time.Clock()
         self._withfps = False
         self._iconpath = iconpath
+        self._isallowdrag = False
+        # self._issmartdrag = False
         if iconpath != None:
             self.tray = _tray(self.title,iconpath)
     def update(self, fps=-1):
@@ -27,6 +32,11 @@ class win(_surface):
             self._clock.tick(fps)
             self._withfps = True
         _pg.display.update()
+    def resize(self, size=None):
+        if size == None:
+            return self.size
+        else:
+            self._orig = _pg.display.set_mode(size)
     def title():
         def fget(self):
             return _pg.display.get_caption()[0]
@@ -55,27 +65,67 @@ class win(_surface):
     def fullscreen(self):
         _pg.display.toogle_fullscreen()
     def close(self):
+        # _w32g.PostMessage(self.hwnd, _w32c.WM_CLOSE, 0, 0)
         _pg.display.quit()
-        _w32g.PostMessage(self.hwnd, _w32c.WM_CLOSE, 0, 0)
-        self.tray.stop()
+        try:self.tray.stop()
+        except:pass
     def focus(self):
         self.hide()
         self.show()
         _w32g.BringWindowToTop(self.hwnd)
         _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOWNORMAL)
         _w32g.SetForegroundWindow(self.hwnd)
-    def unfocus(self):
-        pass
     def hide(self):
         _w32g.ShowWindow(self.hwnd, _w32c.SW_HIDE)
     def show(self):
         _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOW)
     def move(self, x, y):
         rect = _w32g.GetWindowRect(self.hwnd)
-        _w32g.MoveWindow(self.hwnd, x, y, rect[2]-x, rect[3]-y, 0)
+        _w32g.MoveWindow(self.hwnd, int(x), int(y),
+                         rect[2]-x, rect[3]-y, 0)
     def screenshot(self, path):
         _s(self._orig, path)
         return path
+    def center(self,x=_w32a.GetSystemMetrics(0)/2,
+                    y=_w32a.GetSystemMetrics(1)/2):
+        self.move(x-self.size[0]/2,y-self.size[1]/2)
+    def denyDrag(self):
+        self._isallowdrag = True
+        def loop(self):
+            while self._isallowdrag:
+                pos = _m.get_position()
+                pos = [pos[i]-self.position[i] for i in range(2)]
+                if pos[0] < _w32g.GetWindowRect(self.hwnd)[2]-137:
+                    if pos[1] < 30:
+                        _m.release('left')
+        _t.Thread(target=lambda:loop(self),daemon=1).start()
+    def allowDrag(self):
+        self._isallowdrag = False
+    # def smartDrag(self, x):
+    #     self.allowDrag()
+    #     self._issmartdrag = x
+    #     if x:
+    #         self._isallowdrag = True
+    #         def loop(self):
+    #             wsd = None
+    #             while self._issmartdrag:
+    #                 self.update()
+    #                 pos = _m.get_position()
+    #                 pos = [pos[i]-self.position[i] for i in range(2)]
+    #                 if pos[0] < _w32g.GetWindowRect(self.hwnd)[2]-137:
+    #                     if pos[1] < 30:
+    #                         if _m.is_pressed('left'):
+    #                             _m.release('left')
+    #                             if wsd == None:
+    #                                 wsd = pos+list(self.position)
+    #                             else:
+    #                                 if wsd != pos+list(self.position):
+    #                                     self.move(wsd[2]+(pos[0]-wsd[0]),
+    #                                               wsd[3]+(pos[1]-wsd[1]))
+    #                         else:
+    #                             wsd = None
+    #                 _ti.sleep(0.5)
+    #         _t.Thread(target=lambda:loop(self),daemon=1).start()
     @property
     def position(self):
         rect = _w32g.GetWindowRect(self.hwnd)
@@ -109,7 +159,7 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
             _pg.display.set_caption(title)
         if icon != None:
             _pg.display.set_icon(_pg.image.load(icon))
-    return win(icon)
+    return _win(icon)
 
 def ramLimit(memory_limit):
     hjob = _w32j.CreateJobObject(None,job_name)

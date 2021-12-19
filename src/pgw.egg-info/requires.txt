@@ -2,6 +2,7 @@ cython
 pywin32
 pygame
 inputs
+randstr
 pydub
 wxPython
 pyautogui

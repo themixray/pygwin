@@ -1,6 +1,7 @@
 import win32console as w32con
 import win32con as w32c
 import win32gui as w32g
+import win32api as w32a
 import pyautogui as pag
 
 class console:
@@ -40,6 +41,9 @@ class console:
             pass
         return locals()
     title = property(**title())
+    def center(self,x=w32a.GetSystemMetrics(0)/2,
+                    y=w32a.GetSystemMetrics(1)/2):
+        self.move(x-self.size[0]/2,y-self.size[1]/2)
     @property
     def visible(self):
         return w32g.IsWindowVisible(self.hwnd)
