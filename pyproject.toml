@@ -2,7 +2,6 @@
 requires = [
     "pydub",
     "pygame",
-    "pywin32",
     "requests",
     "pyautogui",
     "inputs",
