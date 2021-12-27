@@ -4,10 +4,14 @@ from datetime import datetime as _dt
 from pygwin.image import save as _s
 from pygwin._pg import pg as _pg
 import pygwin.image as _img
-import win32job as _w32j
-import win32api as _w32a
-import win32con as _w32c
-import win32gui as _w32g
+try:
+    import win32job as _w32j
+    import win32api as _w32a
+    import win32con as _w32c
+    import win32gui as _w32g
+    nonwin32api = False
+except:
+    nonwin32api = True
 import requests as _req
 import tempfile as _tf
 import threading as _t
@@ -70,37 +74,46 @@ class _win(_surface):
         try:self.tray.stop()
         except:pass
     def focus(self):
-        self.hide()
-        self.show()
-        _w32g.BringWindowToTop(self.hwnd)
-        _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOWNORMAL)
-        _w32g.SetForegroundWindow(self.hwnd)
+        if not nonwin32api:
+            self.hide()
+            self.show()
+            _w32g.BringWindowToTop(self.hwnd)
+            _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOWNORMAL)
+            _w32g.SetForegroundWindow(self.hwnd)
     def hide(self):
-        _w32g.ShowWindow(self.hwnd, _w32c.SW_HIDE)
+        if not nonwin32api:
+            _w32g.ShowWindow(self.hwnd, _w32c.SW_HIDE)
     def show(self):
-        _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOW)
+        if not nonwin32api:
+            _w32g.ShowWindow(self.hwnd, _w32c.SW_SHOW)
     def move(self, x, y):
-        rect = _w32g.GetWindowRect(self.hwnd)
-        _w32g.MoveWindow(self.hwnd, int(x), int(y),
-                         rect[2]-x, rect[3]-y, 0)
+        if not nonwin32api:
+            rect = self._getRect()
+            _w32g.MoveWindow(self.hwnd, int(x), int(y),
+                             rect[2]-x, rect[3]-y, 0)
     def screenshot(self, path):
         _s(self._orig, path)
         return path
-    def center(self,x=_w32a.GetSystemMetrics(0)/2,
-                    y=_w32a.GetSystemMetrics(1)/2):
+    def center(self,x=_pg.display.get_desktop_sizes()[0][0]/2,
+                    y=_pg.display.get_desktop_sizes()[0][1]/2):
         self.move(x-self.size[0]/2,y-self.size[1]/2)
+    def _getRect(self):
+        if not nonwin32api:
+            return _w32g.GetWindowRect(self.hwnd)
     def denyDrag(self):
-        self._isallowdrag = True
-        def loop(self):
-            while self._isallowdrag:
-                pos = _m.get_position()
-                pos = [pos[i]-self.position[i] for i in range(2)]
-                if pos[0] < _w32g.GetWindowRect(self.hwnd)[2]-137:
-                    if pos[1] < 30:
-                        _m.release('left')
-        _t.Thread(target=lambda:loop(self),daemon=1).start()
+        if not nonwin32api:
+            self._isallowdrag = True
+            def loop(self):
+                while self._isallowdrag:
+                    pos = _m.get_position()
+                    pos = [pos[i]-self.position[i] for i in range(2)]
+                    if pos[0] < self._getRect()[2]-137:
+                        if pos[1] < 30:
+                            _m.release('left')
+            _t.Thread(target=lambda:loop(self),daemon=1).start()
     def allowDrag(self):
-        self._isallowdrag = False
+        if not nonwin32api:
+            self._isallowdrag = False
     # def smartDrag(self, x):
     #     self.allowDrag()
     #     self._issmartdrag = x
@@ -128,10 +141,11 @@ class _win(_surface):
     #         _t.Thread(target=lambda:loop(self),daemon=1).start()
     @property
     def position(self):
-        rect = _w32g.GetWindowRect(self.hwnd)
-        x = rect[0]
-        y = rect[1]
-        return (x, y)
+        if not nonwin32api:
+            rect = self._getRect()
+            x = rect[0]
+            y = rect[1]
+            return (x, y)
     @property
     def rawFps(self):
         if self._withfps:
@@ -143,10 +157,12 @@ class _win(_surface):
         return int(self.rawFps)
     @property
     def hwnd(self):
-        return _pg.display.get_wm_info()['window']
+        if not nonwin32api:
+            return _pg.display.get_wm_info()['window']
     @property
     def visible(self):
-        return _w32g.IsWindowVisible(self._win)
+        if not nonwin32api:
+            return _w32g.IsWindowVisible(self._win)
 
 def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
     screen = _pg.display.set_mode(size)
@@ -162,23 +178,24 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
     return _win(icon)
 
 def ramLimit(memory_limit):
-    hjob = _w32j.CreateJobObject(None,job_name)
-    if breakaway:
-        info = _w32j.QueryInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation)
-        if breakaway=='silent':info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)
-        else:info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_BREAKAWAY_OK)
-        _w32j.SetInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation,info)
-    hprocess = _w32a.GetCurrentProcess()
-    try:_w32j.AssignProcessToJobObject(hjob, hprocess);g_hjob=hjob
-    except _w32j.error as e:
-        if e.winerror!=winerror.ERROR_ACCESS_DENIED:raise
-        elif sys.getwindowsversion()>=(6,2):raise
-        elif _w32j.IsProcessInJob(hprocess,None):raise
-        warnings.warn('The process is already in a job. Nested jobs are not supported prior to Windows 8.')
-    info=_w32j.QueryInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation)
-    info['ProcessMemoryLimit']=memory_limit
-    info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_PROCESS_MEMORY)
-    _w32j.SetInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation,info)
+    if not nonwin32api:
+        hjob = _w32j.CreateJobObject(None,job_name)
+        if breakaway:
+            info = _w32j.QueryInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation)
+            if breakaway=='silent':info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)
+            else:info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_BREAKAWAY_OK)
+            _w32j.SetInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation,info)
+        hprocess = _w32a.GetCurrentProcess()
+        try:_w32j.AssignProcessToJobObject(hjob, hprocess);g_hjob=hjob
+        except _w32j.error as e:
+            if e.winerror!=winerror.ERROR_ACCESS_DENIED:raise
+            elif sys.getwindowsversion()>=(6,2):raise
+            elif _w32j.IsProcessInJob(hprocess,None):raise
+            warnings.warn('The process is already in a job. Nested jobs are not supported prior to Windows 8.')
+        info=_w32j.QueryInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation)
+        info['ProcessMemoryLimit']=memory_limit
+        info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_PROCESS_MEMORY)
+        _w32j.SetInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation,info)
 
 def close():
     _pg.quit()

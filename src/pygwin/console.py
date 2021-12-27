@@ -1,67 +1,86 @@
-import win32console as w32con
-import win32con as w32c
-import win32gui as w32g
-import win32api as w32a
+from pygwin._pg import pg
+try:
+    import win32console as w32con
+    import win32con as w32c
+    import win32gui as w32g
+    import win32api as w32a
+    nonwin32api = True
+except:
+    nonwin32api = False
 import pyautogui as pag
 
 class console:
     def __init__(self):
-        self._hwnd = w32con.GetConsoleWindow()
+        if not nonwin32api:
+            self._hwnd = w32con.GetConsoleWindow()
     @property
     def hwnd(self):
-        return self._hwnd
+        if not nonwin32api:
+            return self._hwnd
     def focus(self):
-        self.hide()
-        self.show()
-        w32g.BringWindowToTop(self.hwnd)
-        w32g.ShowWindow(self.hwnd, w32c.SW_SHOWNORMAL)
-        w32g.SetForegroundWindow(self.hwnd)
-    def unfocus(self):
-        pass
+        if not nonwin32api:
+            self.hide()
+            self.show()
+            w32g.BringWindowToTop(self.hwnd)
+            w32g.ShowWindow(self.hwnd, w32c.SW_SHOWNORMAL)
+            w32g.SetForegroundWindow(self.hwnd)
     def hide(self):
-        w32g.ShowWindow(self.hwnd, w32c.SW_HIDE)
+        if not nonwin32api:
+            w32g.ShowWindow(self.hwnd, w32c.SW_HIDE)
     def show(self):
-        w32g.ShowWindow(self.hwnd, w32c.SW_SHOW)
+        if not nonwin32api:
+            w32g.ShowWindow(self.hwnd, w32c.SW_SHOW)
     def move(self, x, y):
-        w32g.SetWindowPos(self.hwnd, x, y, self.size[0], self.size[1])
+        if not nonwin32api:
+            w32g.SetWindowPos(self.hwnd, x, y, self.size[0], self.size[1])
     def resize(self, width, height):
-        w32g.SetWindowPos(self.hwnd, self.position[0], self.position[1], width, height)
+        if not nonwin32api:
+            w32g.SetWindowPos(self.hwnd, self.position[0], self.position[1], width, height)
     def minimize(self):
-        w32g.ShowWindow(hwnd, w32c.SW_MINIMIZE)
-        return self.size
+        if not nonwin32api:
+            w32g.ShowWindow(hwnd, w32c.SW_MINIMIZE)
+            return self.size
     def maximize(self):
-        w32g.ShowWindow(hwnd, w32c.SW_MAXIMIZE)
-        return self.size
+        if not nonwin32api:
+            w32g.ShowWindow(hwnd, w32c.SW_MAXIMIZE)
+            return self.size
     def title():
         def fget(self):
-            return w32con.GetConsoleTitle()
+            if not nonwin32api:
+                return w32con.GetConsoleTitle()
         def fset(self, value):
-            w32con.SetConsoleTitle(str(value))
+            if not nonwin32api:
+                w32con.SetConsoleTitle(str(value))
         def fdel(self):
             pass
         return locals()
     title = property(**title())
-    def center(self,x=w32a.GetSystemMetrics(0)/2,
-                    y=w32a.GetSystemMetrics(1)/2):
-        self.move(x-self.size[0]/2,y-self.size[1]/2)
+    def center(self,x=_pg.display.get_desktop_sizes()[0][0]/2,
+                    y=_pg.display.get_desktop_sizes()[0][1]/2):
+        if not nonwin32api:
+            self.move(x-self.size[0]/2,y-self.size[1]/2)
     @property
     def visible(self):
-        return w32g.IsWindowVisible(self.hwnd)
+        if not nonwin32api:
+            return w32g.IsWindowVisible(self.hwnd)
     @property
     def position(self):
-        rect = w32g.GetWindowRect(self.hwnd)
-        x = rect[0]+7
-        y = rect[1]
-        return (x, y)
+        if not nonwin32api:
+            rect = w32g.GetWindowRect(self.hwnd)
+            x = rect[0]+7
+            y = rect[1]
+            return (x, y)
     @property
     def size(self):
-        rect = w32g.GetWindowRect(self.hwnd)
-        w = rect[2] - self.position[0]-7
-        h = rect[3] - self.position[1]-7
-        return (w, h)
+        if not nonwin32api:
+            rect = w32g.GetWindowRect(self.hwnd)
+            w = rect[2] - self.position[0]-7
+            h = rect[3] - self.position[1]-7
+            return (w, h)
     def screenshot(self, path):
-        rect = self.position+self.size
-        self.focus()
-        pag.screenshot(path, region=rect)
-        return path
+        if not nonwin32api:
+            rect = self.position+self.size
+            self.focus()
+            pag.screenshot(path, region=rect)
+            return path
 console = console()
