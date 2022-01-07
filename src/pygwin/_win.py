@@ -14,7 +14,7 @@ except:
     nonwin32api = True
 import sys as _sys
 import warnings as _warn
-import winwerror as _we
+import winerror as _we
 import requests as _req
 import tempfile as _tf
 import threading as _t
