@@ -12,6 +12,9 @@ try:
     nonwin32api = False
 except:
     nonwin32api = True
+import sys as _sys
+import warnings as _warn
+import winwerror as _we
 import requests as _req
 import tempfile as _tf
 import threading as _t
@@ -179,25 +182,46 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
 
 def ramLimit(memory_limit):
     if not nonwin32api:
-        job_name = ''
-        breakaway = 'silent'
-        hjob = _w32j.CreateJobObject(None,job_name)
-        if breakaway:
-            info = _w32j.QueryInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation)
-            if breakaway=='silent':info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)
-            else:info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_BREAKAWAY_OK)
-            _w32j.SetInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation,info)
-        hprocess = _w32a.GetCurrentProcess()
-        try:_w32j.AssignProcessToJobObject(hjob, hprocess);g_hjob=hjob
-        except _w32j.error as e:
-            if e.winerror!=winerror.ERROR_ACCESS_DENIED:raise
-            elif sys.getwindowsversion()>=(6,2):raise
-            elif _w32j.IsProcessInJob(hprocess,None):raise
-            warnings.warn('The process is already in a job. Nested jobs are not supported prior to Windows 8.')
-        info=_w32j.QueryInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation)
-        info['ProcessMemoryLimit']=memory_limit
-        info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_PROCESS_MEMORY)
-        _w32j.SetInformationJobObject(g_hjob,_w32j.JobObjectExtendedLimitInformation,info)
+        g_hjob = None
+        def create_job(job_name='', breakaway='silent'):
+            hjob = _w32j.CreateJobObject(None, job_name)
+            if breakaway:
+                info = _w32j.QueryInformationJobObject(hjob,
+                            _w32j.JobObjectExtendedLimitInformation)
+                if breakaway == 'silent':
+                    info['BasicLimitInformation']['LimitFlags'] |= (
+                        _w32j.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)
+                else:
+                    info['BasicLimitInformation']['LimitFlags'] |= (
+                        _w32j.JOB_OBJECT_LIMIT_BREAKAWAY_OK)
+                _w32j.SetInformationJobObject(hjob,
+                    _w32j.JobObjectExtendedLimitInformation, info)
+            return hjob
+        def assign_job(hjob):
+            global g_hjob
+            hprocess = _w32a.GetCurrentProcess()
+            try:
+                _w32j.AssignProcessToJobObject(hjob, hprocess)
+                g_hjob = hjob
+            except _w32j.error as e:
+                if (e._we != _we.ERROR_ACCESS_DENIED or
+                    _sys.getwindowsversion() >= (6, 2) or
+                    not _w32j.IsProcessInJob(hprocess, None)):
+                    raise
+                _warn.warn('The process is already in a job. Nested jobs are not '
+                    'supported prior to Windows 8.')
+        def limit_memory(memory_limit):
+            if g_hjob is None:
+                return
+            info = _w32j.QueryInformationJobObject(g_hjob,
+                        _w32j.JobObjectExtendedLimitInformation)
+            info['ProcessMemoryLimit'] = memory_limit
+            info['BasicLimitInformation']['LimitFlags'] |= (
+                _w32j.JOB_OBJECT_LIMIT_PROCESS_MEMORY)
+            _w32j.SetInformationJobObject(g_hjob,
+                _w32j.JobObjectExtendedLimitInformation, info)
+        assign_job(create_job())
+        limit_memory(memory_limit)
 
 def close():
     _pg.quit()
