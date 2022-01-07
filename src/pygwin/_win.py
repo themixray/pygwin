@@ -179,7 +179,8 @@ def create(title=None, size=(0,0), icon=None, resizable=False, noframe=False):
 
 def ramLimit(memory_limit):
     if not nonwin32api:
-        hjob = _w32j.CreateJobObject(None,job_name)
+        breakaway = 'silent'
+        hjob = _w32j.CreateJobObject(None,'')
         if breakaway:
             info = _w32j.QueryInformationJobObject(hjob,_w32j.JobObjectExtendedLimitInformation)
             if breakaway=='silent':info['BasicLimitInformation']['LimitFlags']|=(_w32j.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)
