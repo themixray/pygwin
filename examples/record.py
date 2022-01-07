@@ -1,4 +1,4 @@
-import pygwin 
+import pygwin
 import random
 
 win = pygwin.create('A Simple Game', (500,500))
@@ -9,14 +9,14 @@ apple = pygwin.rect(random.randint(0,490),
 score = 0
 
 record = pygwin.record(win,True) # Init recording
-record.start() # Start recording
+record.start()                   # Start recording
 
 run = True
 while run:
     for event in pygwin.getEvents():
         if event.type == pygwin.QUIT:
             run = False
-            record.stop() # Stop recording
+            record.stop()        # Stop recording
     win.fill((255,255,255))
 
     playerRect = pygwin.rect(player[0]-10,player[1]-10,20,20)
@@ -25,18 +25,18 @@ while run:
 
     win.blit(score,(0,0))
 
-    if pygwin.keyboard.isPressed('w'): 
-        player[1] -= 5 
-    if pygwin.keyboard.isPressed('s'): 
-        player[1] += 5 
-    if pygwin.keyboard.isPressed('d'): 
-        player[0] += 5 
+    if pygwin.keyboard.isPressed('w'):
+        player[1] -= 5
+    if pygwin.keyboard.isPressed('s'):
+        player[1] += 5
+    if pygwin.keyboard.isPressed('d'):
+        player[0] += 5
     if pygwin.keyboard.isPressed('a'):
-        player[0] -= 5 
+        player[0] -= 5
 
-    if player[0] <= -10: 
-        player[0] = 510 
-    if player[1] <= -10: 
+    if player[0] <= -10:
+        player[0] = 510
+    if player[1] <= -10:
         player[1] = 510
     if player[0] > 510:
         player[0] = -10
@@ -49,5 +49,5 @@ while run:
         score += 1
 
     win.update(60)
-record.render('Recording.mp4') # Render recording
+record.render('Recording.mp4')   # Render recording
 pygwin.close()
