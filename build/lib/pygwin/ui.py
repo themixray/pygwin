@@ -646,15 +646,20 @@ class checkBox(widget):
     def draw(self, win, pos):
         self._generate(pos)
         win.blit(self.surface,pos)
-# class colorPicker(widget):
-#     def __init__(self):
-#         self._generate()
-#     def _generate(self, position=None):
-#         self.surface = _s((255,self.width))
-#
-#     def draw(self, win, pos):
-#         self._generate(pos)
-#         win.blit(self.surface,pos)
+class comboBox(widget):
+    def __init__(self,text,values=[],
+fontSize=30,font=_df,width=None,height=None,
+bg=(70,70,70),fg=(180,180,200),afg=(50,50,50),
+abg=(200,200,200),borderColor=(50,50,50),borderWidth=5):
+        super()._args(locals())
+        self._generate()
+
+    def _generate(self, position=None):
+        self.surface = _s((255,self.width))
+
+    def draw(self, win, pos):
+        self._generate(pos)
+        win.blit(self.surface,pos)
 class tip(widget):
     def __init__(self,text,responceWidth,responceHeight,fontSize=15,font=_df,
                  borderColor=(180,180,50),borderWidth=2,bg=(255,255,128),
